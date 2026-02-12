@@ -18,9 +18,9 @@ public class DFAState extends State {
         tail = 0;
     }
 
-    public boolean containTran(Character query) {
+    public boolean containsTran(char query) {
         for (int n = 0; n < transitions.length; n++){
-            if (transitions[n] == query){
+            if (transitions[n].equals(query)){
                 return true;
             }
         }

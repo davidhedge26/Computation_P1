@@ -90,7 +90,6 @@ public class DFA implements DFAInterface {
     @Override
     public void addSigma(char symbol) {
         sigma.add(symbol);
-        sigma.contains(symbol); // This line is simply for display purposes, not for functional reasons
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addSigma'");
     }
@@ -166,11 +165,17 @@ public class DFA implements DFAInterface {
      */
     @Override
     public boolean addTransition(String fromState, String toState, char onSymb) { 
+        // check if transition exists in alphabet
+        if (!sigma.contains(onSymb)) return false;
+
         // Find the fromState in the list
         Iterator<DFAState> iter = states.iterator();
         while (iter.hasNext()){
             DFAState check = iter.next();
             if (check.getName().equals(fromState)){
+                // if the transition already exists in that object then return false
+                if (check.containsTran(onSymb)) return false;
+                
                 // add transition to fromState
                 check.addTransition(onSymb);
             }
