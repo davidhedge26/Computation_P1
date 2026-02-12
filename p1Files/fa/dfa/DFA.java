@@ -161,13 +161,14 @@ public class DFA implements DFAInterface {
      */
     @Override
     public boolean addTransition(String fromState, String toState, char onSymb) { 
-        if (!states.contains(fromState) || !states.contains(toState)){
-            return false;
-        }
+        // Find the fromState in the list
         Iterator<DFAState> iter = states.iterator();
         while (iter.hasNext()){
-            iter.equals(fromState);
-            iter.next();
+            DFAState check = iter.next();
+            if (check.getName().equals(fromState)){
+                // add transition to fromState
+                check.addTransition(onSymb);
+            }
         }
         return true;
     }
