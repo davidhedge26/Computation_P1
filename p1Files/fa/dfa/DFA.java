@@ -73,8 +73,13 @@ public class DFA implements DFAInterface {
      */
     @Override
     public boolean setStart(String name) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setStart'");
+        for (DFAState iter: states) {
+            if (iter.toString().equalsIgnoreCase(name)){
+                init = iter;
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
