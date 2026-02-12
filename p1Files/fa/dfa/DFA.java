@@ -90,8 +90,6 @@ public class DFA implements DFAInterface {
     @Override
     public void addSigma(char symbol) {
         sigma.add(symbol);
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addSigma'");
     }
 
     /**
