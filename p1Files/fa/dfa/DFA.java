@@ -1,6 +1,7 @@
 package fa.dfa;
 
 import java.util.LinkedHashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
@@ -83,6 +84,8 @@ public class DFA implements DFAInterface {
      */
     @Override
     public void addSigma(char symbol) {
+        sigma.add(symbol);
+        sigma.contains(symbol); // This line is simply for display purposes, not for functional reasons
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addSigma'");
     }
@@ -157,9 +160,16 @@ public class DFA implements DFAInterface {
      *         symbol in not in the alphabet
      */
     @Override
-    public boolean addTransition(String fromState, String toState, char onSymb) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addTransition'");
+    public boolean addTransition(String fromState, String toState, char onSymb) { 
+        if (!states.contains(fromState) || !states.contains(toState)){
+            return false;
+        }
+        Iterator<DFAState> iter = states.iterator();
+        while (iter.hasNext()){
+            iter.equals(fromState);
+            iter.next();
+        }
+        return true;
     }
 
     /**
