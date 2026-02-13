@@ -1,6 +1,7 @@
 package fa.dfa;
 
 import java.util.LinkedHashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
@@ -26,8 +27,8 @@ public class DFA implements DFAInterface {
     private LinkedHashSet<DFAState> states = new LinkedHashSet<>();
     private DFAState init = new DFAState(null);
     private LinkedHashSet<DFAState> finState = new LinkedHashSet<>();
-    private LinkedHashMap<Character, DFAState> innerdelta = new LinkedHashMap<>();
-    private LinkedHashMap<LinkedHashMap<Character, DFAState>, DFAState> outterdelta = new LinkedHashMap<>();
+    private HashMap<DFAState, Character> stateTransition = new LinkedHashMap<>();
+    private LinkedHashMap<HashMap<DFAState, Character>, DFAState> transitionState = new LinkedHashMap<>();
 
     /**
      * Adds a a state to the FA instance
@@ -73,8 +74,8 @@ public class DFA implements DFAInterface {
      */
     @Override
     public boolean setStart(String name) {
-        for (DFAState iter: states) {
-            if (iter.toString().equalsIgnoreCase(name)){
+        for (DFAState iter : states) {
+            if (iter.toString().equalsIgnoreCase(name)) {
                 init = iter;
                 return true;
             }
@@ -123,9 +124,12 @@ public class DFA implements DFAInterface {
      * @return state object or null
      */
     @Override
-    public State getState(String name) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getState'");
+    public DFAState getState(String name) {
+        for (DFAState iter : states) {
+            if (iter.toString().equalsIgnoreCase(name))
+                return iter;
+        }
+        return null;
     }
 
     /**
@@ -162,20 +166,25 @@ public class DFA implements DFAInterface {
      *         symbol in not in the alphabet
      */
     @Override
-    public boolean addTransition(String fromState, String toState, char onSymb) { 
+    public boolean addTransition(String fromState, String toState, char onSymb) {
         // check if transition exists in alphabet
-        if (!sigma.contains(onSymb)) return false;
+        if (!sigma.contains(onSymb))
+            return false;
 
         // Find the fromState in the list
         Iterator<DFAState> iter = states.iterator();
-        while (iter.hasNext()){
+        while (iter.hasNext()) {
             DFAState check = iter.next();
-            if (check.getName().equals(fromState)){
+            if (check.getName().equals(fromState)) {
                 // if the transition already exists in that object then return false
-                if (check.containsTran(onSymb)) return false;
-                
+                if (check.containsTran(onSymb))
+                    return false;
+
                 // add transition to fromState
                 check.addTransition(onSymb);
+                this.stateTransition.put(check, onSymb);
+                this.transitionState.put(this.stateTransition, getState(toState));
+
             }
         }
         return true;
