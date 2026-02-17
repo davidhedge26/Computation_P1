@@ -158,7 +158,7 @@ public class DFA implements DFAInterface {
      */
     @Override
     public boolean isStart(String name) {
-        return (getState(name) == init) ?  true : false;
+        return (name == init.getName()) ?  true : false;
     }
 
     /**
@@ -210,8 +210,25 @@ public class DFA implements DFAInterface {
      */
     @Override
     public DFA swap(char symb1, char symb2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'swap'");
+        DFA copy = new DFA();
+
+        Iterator<DFAState> iter = states.iterator();
+        while (iter.hasNext()){
+            DFAState next = iter.next();
+            copy.addState(next.getName());
+            if (finState.contains(next)){
+                copy.setFinal(next.getName());
+            }
+            if (isStart(next.getName())){
+                copy.init = copy.getState(next.getName());
+            }
+
+            copy.getState(next.getName()).addTransition(symb1);
+            copy.getState(next.getName()).addTransition(symb2);
+        }
+        copy.init = init;
+
+        return copy;
     }
 
     /**
