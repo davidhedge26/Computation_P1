@@ -1,6 +1,9 @@
 package fa.dfa;
 
 import java.util.LinkedHashSet;
+
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -171,6 +174,10 @@ public class DFA implements DFAInterface {
         if (!sigma.contains(onSymb))
             return false;
 
+        if (getState(toState) == null) return false;
+
+        // This chunk can be removed with just "if (!states.contains(fromState) return false;"
+        // This looks to be faster though, just barely, so I don't think it's worth removing
         // Find the fromState in the list
         Iterator<DFAState> iter = states.iterator();
         while (iter.hasNext()) {
@@ -184,10 +191,11 @@ public class DFA implements DFAInterface {
                 check.addTransition(onSymb);
                 this.stateTransition.put(check, onSymb);
                 this.transitionState.put(this.stateTransition, getState(toState));
-
+                return true;
             }
         }
-        return true;
+        // Runs only when no state is found with the same name as given fromState
+        return false;
     }
 
     /**

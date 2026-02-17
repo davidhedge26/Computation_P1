@@ -19,16 +19,22 @@ public class DFAState extends State {
     }
 
     public boolean containsTran(char query) {
-        for (int n = 0; n < transitions.length; n++){
+        if (transitions[0] == null){
+            return false; // list hasn't begun being filled yet. List does not contain transition
+        }
+        for (int n = 0; n < transitions.length-1; n++){
             if (transitions[n].equals(query)){
                 return true;
+            }
+            if (transitions[n] == null){
+                return false;
             }
         }
         return false;
     }
 
     public boolean addTransition(char newTran){
-        if (tail+1 >= transitions.length){
+        if (tail+1 > transitions.length){
             overflow();
         }
         transitions[tail] = newTran;
