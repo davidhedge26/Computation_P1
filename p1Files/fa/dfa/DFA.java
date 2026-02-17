@@ -116,8 +116,7 @@ public class DFA implements DFAInterface {
      */
     @Override
     public Set<Character> getSigma() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getSigma'");
+        return sigma;
     }
 
     /**
@@ -143,20 +142,23 @@ public class DFA implements DFAInterface {
      */
     @Override
     public boolean isFinal(String name) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isFinal'");
+        Iterator<DFAState> iter = finState.iterator();
+        while (iter.hasNext()){
+            DFAState checker = iter.next();
+            if (getState(name) == checker) return true;
+        }
+        return false;
     }
 
     /**
-     * Determines if a state with name is final
+     * Determines if a state with name is start
      * 
      * @param name the name of the state
      * @return true if a state with that name exists and it is the start state
      */
     @Override
     public boolean isStart(String name) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isStart'");
+        return (getState(name) == init) ?  true : false;
     }
 
     /**
@@ -176,8 +178,8 @@ public class DFA implements DFAInterface {
 
         if (getState(toState) == null) return false;
 
-        // This chunk can be removed with just "if (!states.contains(fromState) return false;"
-        // This looks to be faster though, just barely, so I don't think it's worth removing
+        // This chunk can be removed with just "if (getSate(toState) == null) return false;"
+        // This looks to be faster though, just barely though. Even still I don't think it's worth removing
         // Find the fromState in the list
         Iterator<DFAState> iter = states.iterator();
         while (iter.hasNext()) {
