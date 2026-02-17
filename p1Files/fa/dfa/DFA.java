@@ -209,7 +209,7 @@ public class DFA implements DFAInterface {
      * @return a copy of this DFA
      */
     @Override
-    public DFA swap(char symb1, char symb2) {
+    public DFA swap(char symb2, char symb1) {
         DFA copy = new DFA();
 
         Iterator<DFAState> iter = states.iterator();
@@ -223,8 +223,8 @@ public class DFA implements DFAInterface {
                 copy.init = copy.getState(next.getName());
             }
 
-            copy.getState(next.getName()).addTransition(symb1);
             copy.getState(next.getName()).addTransition(symb2);
+            copy.getState(next.getName()).addTransition(symb1);
         }
         copy.init = init;
 
