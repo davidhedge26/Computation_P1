@@ -105,8 +105,20 @@ public class DFA implements DFAInterface {
      */
     @Override
     public boolean accepts(String s) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'accepts'");
+        DFAState iter = init;
+        boolean fin = true;
+        for (int n = 0; fin == true; n++){
+            char x = s.charAt(n);
+            if (iter.containsTran(x)){
+                iter = getState(iter.next(x));
+                if (n < s.length()){
+                    return (finState.contains(iter));
+                }
+            } else {
+                fin = false;
+            }
+        }
+        return false;
     }
 
     /**
@@ -190,7 +202,7 @@ public class DFA implements DFAInterface {
                     return false;
 
                 // add transition to fromState
-                check.addTransition(onSymb);
+                check.addTransition(toState, onSymb);
                 this.stateTransition.put(check, onSymb);
                 this.transitionState.put(this.stateTransition, getState(toState));
                 return true;
@@ -223,8 +235,8 @@ public class DFA implements DFAInterface {
                 copy.init = copy.getState(next.getName());
             }
 
-            copy.getState(next.getName()).addTransition(symb2);
-            copy.getState(next.getName()).addTransition(symb1);
+            copy.getState(next.getName()).addTransition(next.next(symb1), symb2);
+            copy.getState(next.getName()).addTransition(next.next(symb2), symb1);
         }
         copy.init = init;
 
