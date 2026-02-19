@@ -109,14 +109,20 @@ public class DFA implements DFAInterface {
         DFAState iter = init;
         boolean fin = true;
         for (int n = 0; fin == true; n++) {
-            char x = s.charAt(n);
-            if (iter.containsTran(x)) {
-                iter = getState(iter.next(x));
-                if (n < s.length()) {
-                    return (finState.contains(iter));
+            try {
+                char x = s.charAt(n);
+
+                // Is the character valid?
+                if (iter.containsTran(x)){
+                    iter = getState(iter.next(x));
+                    if ((iter != null) && (n == s.length()-1)){
+                        return isFinal(iter.getName());
+                    }
+                } else {
+                    fin = false;
                 }
-            } else {
-                fin = false;
+            } catch (IndexOutOfBoundsException e){
+                return false;
             }
         }
         return false;
@@ -155,13 +161,7 @@ public class DFA implements DFAInterface {
      */
     @Override
     public boolean isFinal(String name) {
-        Iterator<DFAState> iter = finState.iterator();
-        while (iter.hasNext()) {
-            DFAState checker = iter.next();
-            if (getState(name) == checker)
-                return true;
-        }
-        return false;
+        return (finState.contains(getState(name)));
     }
 
     /**
@@ -172,7 +172,7 @@ public class DFA implements DFAInterface {
      */
     @Override
     public boolean isStart(String name) {
-        return (name == init.getName()) ? true : false;
+        return (name == init.getName());
     }
 
     /**
@@ -195,7 +195,7 @@ public class DFA implements DFAInterface {
 
         // This chunk can be removed with just "if (getSate(toState) == null) return
         // false;"
-        // This looks to be faster though, just barely though. Even still I don't think
+        // This looks to be faster though, just barely. Even still I don't think
         // it's worth removing
         // Find the fromState in the list
         Iterator<DFAState> iter = states.iterator();
