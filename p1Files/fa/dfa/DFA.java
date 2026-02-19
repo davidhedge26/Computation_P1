@@ -1,6 +1,7 @@
 package fa.dfa;
 
 import java.util.LinkedHashSet;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -107,11 +108,11 @@ public class DFA implements DFAInterface {
     public boolean accepts(String s) {
         DFAState iter = init;
         boolean fin = true;
-        for (int n = 0; fin == true; n++){
+        for (int n = 0; fin == true; n++) {
             char x = s.charAt(n);
-            if (iter.containsTran(x)){
+            if (iter.containsTran(x)) {
                 iter = getState(iter.next(x));
-                if (n < s.length()){
+                if (n < s.length()) {
                     return (finState.contains(iter));
                 }
             } else {
@@ -155,9 +156,10 @@ public class DFA implements DFAInterface {
     @Override
     public boolean isFinal(String name) {
         Iterator<DFAState> iter = finState.iterator();
-        while (iter.hasNext()){
+        while (iter.hasNext()) {
             DFAState checker = iter.next();
-            if (getState(name) == checker) return true;
+            if (getState(name) == checker)
+                return true;
         }
         return false;
     }
@@ -170,7 +172,7 @@ public class DFA implements DFAInterface {
      */
     @Override
     public boolean isStart(String name) {
-        return (name == init.getName()) ?  true : false;
+        return (name == init.getName()) ? true : false;
     }
 
     /**
@@ -188,10 +190,13 @@ public class DFA implements DFAInterface {
         if (!sigma.contains(onSymb))
             return false;
 
-        if (getState(toState) == null) return false;
+        if (getState(toState) == null)
+            return false;
 
-        // This chunk can be removed with just "if (getSate(toState) == null) return false;"
-        // This looks to be faster though, just barely though. Even still I don't think it's worth removing
+        // This chunk can be removed with just "if (getSate(toState) == null) return
+        // false;"
+        // This looks to be faster though, just barely though. Even still I don't think
+        // it's worth removing
         // Find the fromState in the list
         Iterator<DFAState> iter = states.iterator();
         while (iter.hasNext()) {
@@ -225,13 +230,13 @@ public class DFA implements DFAInterface {
         DFA copy = new DFA();
 
         Iterator<DFAState> iter = states.iterator();
-        while (iter.hasNext()){
+        while (iter.hasNext()) {
             DFAState next = iter.next();
             copy.addState(next.getName());
-            if (finState.contains(next)){
+            if (finState.contains(next)) {
                 copy.setFinal(next.getName());
             }
-            if (isStart(next.getName())){
+            if (isStart(next.getName())) {
                 copy.init = copy.getState(next.getName());
             }
 
@@ -262,7 +267,37 @@ public class DFA implements DFAInterface {
      */
     @Override
     public String toString() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'swap'");
+        StringBuilder sb = new StringBuilder();
+        // Q States To String
+        sb.append("Q = { ");
+
+        for (DFAState iter : states) {
+            sb.append(iter.toString() + " ");
+        }
+        sb.append("}");
+        // Sigma Alphabet To String
+        sb.append("\nSigma = { ");
+        for (Character iter : sigma) {
+            sb.append(iter.toString() + " ");
+        }
+        sb.append("}");
+        // Delta To String
+        sb.append("\ndelta = \n");
+        for (HashMap.Entry<DFAState, Character> set : stateTransition.entrySet()) {
+            sb.append(set.getValue());
+        }
+        for (Map.Entry<HashMap<DFAState, Character>, DFAState> set : transitionState.entrySet()) {
+            sb.append("\n" + set.getKey()).append(set.getValue());
+        }
+        // q0 to String
+        sb.append("\n q0 = ").append(init.toString());
+        // accept states
+        sb.append("\n F = { ");
+        for (DFAState iter : finState) {
+            sb.append(iter.toString() + " ");
+        }
+        sb.append("}");
+        return sb.toString();
     }
+
 }
