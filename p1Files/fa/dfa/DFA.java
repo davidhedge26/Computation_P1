@@ -3,14 +3,10 @@ package fa.dfa;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
-
-import fa.State;
 
 /**
  * DFA models and manages Definite Finite Automata
@@ -31,8 +27,7 @@ public class DFA implements DFAInterface {
     private LinkedHashSet<DFAState> states = new LinkedHashSet<>();
     private DFAState init = new DFAState(null);
     private LinkedHashSet<DFAState> finState = new LinkedHashSet<>();
-    private HashMap<DFAState, Character> stateTransition = new LinkedHashMap<>();
-    private LinkedHashMap<HashMap<DFAState, Character>, DFAState> transitionState = new LinkedHashMap<>();
+    private LinkedHashMap<DFAState, HashMap<Character, DFAState>> transitionState = new LinkedHashMap<>();
 
     /**
      * Adds a a state to the FA instance
@@ -211,8 +206,15 @@ public class DFA implements DFAInterface {
 
                 // add transition to fromState
                 check.addTransition(toState, onSymb);
-                this.stateTransition.put(check, onSymb);
-                this.transitionState.put(this.stateTransition, getState(toState));
+                // check if entry created in map, create new, else add transition to it:
+                DFAState from = getState(fromState);
+                DFAState to = getState(toState);
+                if (!transitionState.containsKey(from)) {
+                    transitionState.put(from, new HashMap<>());
+                    transitionState.get(from).put(onSymb, to);
+                } else {
+                    transitionState.get(from).put(onSymb, to);
+                }
                 return true;
             }
         }
@@ -291,30 +293,105 @@ public class DFA implements DFAInterface {
         for (DFAState iter : states) {
             sb.append(iter.toString() + " ");
         }
-        sb.append("}");
+        sb.append("}\n");
         // Sigma Alphabet To String
-        sb.append("\nSigma = { ");
+        sb.append("Sigma = {");
         for (Character iter : sigma) {
             sb.append(iter.toString() + " ");
         }
-        sb.append("}");
+        sb.append("}\n");
         // Delta To String
-        sb.append("\ndelta = \n");
-        for (HashMap.Entry<DFAState, Character> set : stateTransition.entrySet()) {
-            sb.append(set.getValue());
-        }
-        for (Map.Entry<HashMap<DFAState, Character>, DFAState> set : transitionState.entrySet()) {
-            sb.append("\n" + set.getKey()).append(set.getValue());
-        }
+        sb.append("delta =\n");
+        sb.append(deltaString());
+
         // q0 to String
-        sb.append("\n q0 = ").append(init.toString());
+        sb.append("q0 = ").append(init.toString() + "\n");
         // accept states
-        sb.append("\n F = { ");
+        sb.append("F = { ");
         for (DFAState iter : finState) {
             sb.append(iter.toString() + " ");
         }
         sb.append("}");
         return sb.toString();
     }
+
+    // helper function to toString the delta structure
+    public String deltaString() {
+        // sb will be our alphabet title
+        // sl will be the state transition printout
+        // two string builders, one map iteration
+        StringBuilder sb = new StringBuilder();
+        StringBuilder sl = new StringBuilder();
+        for (Character alphabet : sigma) {
+            sb.append(" " + alphabet);
+        }
+        sb.append("\n");
+
+        for (Map.Entry<DFAState, HashMap<Character, DFAState>> entry : transitionState.entrySet()) {
+            sl.append(" " + entry.getKey());
+            HashMap<Character, DFAState> innerMap = entry.getValue();
+            for (HashMap.Entry<Character, DFAState> iter : innerMap.entrySet()) {
+                sl.append(" " + iter.getValue());
+
+            }
+            sl.append("\n");
+        }
+        sb.append(sl.toString());
+
+        return sb.toString();
+
+    }
+
+    // debugging for tests, remove prior to submit
+    // (to string output recieved)
+    // Q = { a b }
+    // Sigma = { 0 1 }
+    // delta =
+    // 11
+    // {a=1, b=1}a
+    // {a=1, b=1}b
+    // {a=1, b=1}a
+    // {a=1, b=1}b
+    // q0 = a
+    // F = { b }
+    // (output expected)
+    // String expStr = " Q = { a b }\n"
+    // + "Sigma = { 0 1 }\n"
+    // + "delta =\n"
+    // + " 0 1\n"
+    // + " a a b\n"
+    // + " b a b\n"
+    // + "q0 = a\n"
+    // + "F = { b }";
+    // public static void main(String[] args) {
+    // StringBuilder sg = new StringBuilder();
+    // DFA dfa = new DFA();
+    // dfa.addSigma('0');
+    // dfa.addSigma('1');
+    // assertTrue(dfa.addState("a"));
+    // dfa.addState("b");
+    // dfa.setStart("a");
+    // assertTrue(dfa.setFinal("b"));
+
+    // dfa.addState("a");
+    // dfa.setStart("c");
+    // dfa.setFinal("c");
+
+    // dfa.addTransition("a", "a", '0');
+    // dfa.addTransition("a", "b", '1');
+    // dfa.addTransition("b", "a", '0');
+    // dfa.addTransition("b", "b", '1');
+
+    // dfa.addTransition("c", "b", '1');
+    // dfa.addTransition("a", "c", '1');
+    // dfa.addTransition("a", "b", '2');
+
+    // String dfaStr = dfa.toString();
+
+    // System.out.println(dfaStr);
+
+    // System.out.println(dfa.deltaString());
+
+    // }
 
 }
