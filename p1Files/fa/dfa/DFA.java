@@ -205,8 +205,8 @@ public class DFA implements DFAInterface {
             DFAState check = iter.next();
             if (check.getName().equals(fromState)) {
                 // if the transition already exists in that object then return false
-                if (check.containsTran(onSymb))
-                    return false;
+                if (check.containsTran(onSymb)) 
+                    return true;
 
                 // add transition to fromState
                 check.addTransition(toState, onSymb);
