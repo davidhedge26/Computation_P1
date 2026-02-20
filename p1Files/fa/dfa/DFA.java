@@ -113,13 +113,15 @@ public class DFA implements DFAInterface {
                 char x = s.charAt(n);
 
                 // Is the character valid?
-                if (iter.containsTran(x)){
-                    iter = getState(iter.next(x));
-                    if ((iter != null) && (n == s.length()-1)){
-                        return isFinal(iter.getName());
-                    }
-                } else {
-                    fin = false;
+                if (!iter.containsTran(x)){
+                    return false;
+                }
+
+                iter = getState(iter.next(x));
+                if ((iter != null) && (n == s.length()-1)){
+                    boolean result = isFinal(iter.getName());
+                    return result;
+                    // return isFinal(iter.getName());
                 }
             } catch (IndexOutOfBoundsException e){
                 return false;
@@ -226,24 +228,36 @@ public class DFA implements DFAInterface {
      * @return a copy of this DFA
      */
     @Override
-    public DFA swap(char symb2, char symb1) {
+    public DFA swap(char symb1, char symb2) {
         DFA copy = new DFA();
+        copy.addSigma(symb1);
+        copy.addSigma(symb2);
 
         Iterator<DFAState> iter = states.iterator();
         while (iter.hasNext()) {
+            // Grab next state and make it initial or final if it is so
             DFAState next = iter.next();
-            copy.addState(next.getName());
+            String name = next.getName();
+            copy.addState(name);
             if (finState.contains(next)) {
-                copy.setFinal(next.getName());
+                copy.setFinal(name);
             }
-            if (isStart(next.getName())) {
-                copy.init = copy.getState(next.getName());
+            if (isStart(name)) {
+                copy.setStart(name);
             }
-
-            copy.getState(next.getName()).addTransition(next.next(symb1), symb2);
-            copy.getState(next.getName()).addTransition(next.next(symb2), symb1);
         }
-        copy.init = init;
+        iter = states.iterator();
+        while (iter.hasNext()){
+            DFAState next = iter.next();
+            String name = next.getName();
+            // Add reversed transitions into states
+            if (next.containsTran(symb1)){
+                copy.addTransition(name, next.next(symb1), symb2);
+            }
+            if (next.containsTran(symb2)){
+                copy.addTransition(name, next.next(symb2), symb1);
+            }
+        }
 
         return copy;
     }
