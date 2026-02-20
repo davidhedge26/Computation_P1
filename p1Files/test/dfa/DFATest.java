@@ -72,7 +72,9 @@ public class DFATest {
 
 	@Test
 	public void test1_4() {
+
 		DFA dfa = dfa1();
+		System.out.println(dfa.toString());
 
 		String dfaStr = dfa.toString();
 		String expStr = " Q = { a b }\n"
@@ -195,10 +197,10 @@ public class DFATest {
 	@Test
 	public void test2_4() {
 		DFA dfa = dfa2();
-
+		System.out.println(dfa.toString());
 		String dfaStr = dfa.toString();
-		String expStr = "Q={3 0 1 2}\n"
-				+ "Sigma = {0 1}\n"
+		String expStr = "Q = { 3 0 1 2 }\n"
+				+ "Sigma = { 0 1 }\n"
 				+ "delta =\n"
 				+ "	0	1\n"
 				+ "3	3	3\n"
@@ -206,7 +208,7 @@ public class DFATest {
 				+ "1	3	2\n"
 				+ "2	1	1\n"
 				+ "q0 = 0\n"
-				+ "F={3}\n";
+				+ "F = { 3 }\n";
 		assertTrue(dfaStr.replaceAll("\\s", "").equals(expStr.replaceAll("\\s", "")));
 		System.out.println("dfa2 toString pass");
 	}
@@ -343,7 +345,7 @@ public class DFATest {
 	@Test
 	public void test3_4() {
 		DFA dfa = dfa3();
-
+		System.out.println(dfa.toString());
 		String dfaStr = dfa.toString();
 		String expStr = "Q={GDABCEF}\n"
 				+ "Sigma = {2 1}\n"

@@ -108,19 +108,20 @@ public class DFA implements DFAInterface {
                 char x = s.charAt(n);
 
                 // Does the character reference a valid transition?
-                if (!iter.containsTran(x)){
+                if (!iter.containsTran(x)) {
                     return false;
                 }
 
-                // Have we reached the end of the string? Does the string actually go to a valid state?
+                // Have we reached the end of the string? Does the string actually go to a valid
+                // state?
                 iter = getState(iter.next(x));
-                if ((iter != null) && (n == s.length()-1)){
+                if ((iter != null) && (n == s.length() - 1)) {
                     // Is the last state reached a valid final state?
                     return isFinal(iter.getName());
                 }
-            } catch (IndexOutOfBoundsException e){
+            } catch (IndexOutOfBoundsException e) {
                 // For when the string never reaches a final state and runs out of characters
-                return false; 
+                return false;
             }
         }
         return false;
@@ -201,7 +202,7 @@ public class DFA implements DFAInterface {
             DFAState check = iter.next();
             if (check.getName().equals(fromState)) {
                 // if the transition already exists in that object then return false
-                if (check.containsTran(onSymb)) 
+                if (check.containsTran(onSymb))
                     return true;
 
                 // add transition to fromState
@@ -236,10 +237,11 @@ public class DFA implements DFAInterface {
         DFA copy = new DFA();
         copy.addSigma(symb1);
         copy.addSigma(symb2);
-        
+
         Iterator<DFAState> iter = states.iterator();
         while (iter.hasNext()) {
-            // Grab next state and make it initial or final in copy if it is so in the original DFA
+            // Grab next state and make it initial or final in copy if it is so in the
+            // original DFA
             DFAState next = iter.next();
             String name = next.getName();
             copy.addState(name);
@@ -252,14 +254,14 @@ public class DFA implements DFAInterface {
         }
         // Iterate through all states again to add swapped transitions
         iter = states.iterator();
-        while (iter.hasNext()){
+        while (iter.hasNext()) {
             DFAState next = iter.next();
             String name = next.getName();
             // Add reversed transitions into states
-            if (next.containsTran(symb1)){
-                copy.addTransition(name, next.next(symb1), symb2); 
+            if (next.containsTran(symb1)) {
+                copy.addTransition(name, next.next(symb1), symb2);
             }
-            if (next.containsTran(symb2)){
+            if (next.containsTran(symb2)) {
                 copy.addTransition(name, next.next(symb2), symb1);
             }
         }
@@ -341,57 +343,5 @@ public class DFA implements DFAInterface {
         return sb.toString();
 
     }
-
-    // debugging for tests, remove prior to submit
-    // (to string output recieved)
-    // Q = { a b }
-    // Sigma = { 0 1 }
-    // delta =
-    // 11
-    // {a=1, b=1}a
-    // {a=1, b=1}b
-    // {a=1, b=1}a
-    // {a=1, b=1}b
-    // q0 = a
-    // F = { b }
-    // (output expected)
-    // String expStr = " Q = { a b }\n"
-    // + "Sigma = { 0 1 }\n"
-    // + "delta =\n"
-    // + " 0 1\n"
-    // + " a a b\n"
-    // + " b a b\n"
-    // + "q0 = a\n"
-    // + "F = { b }";
-    // public static void main(String[] args) {
-    // StringBuilder sg = new StringBuilder();
-    // DFA dfa = new DFA();
-    // dfa.addSigma('0');
-    // dfa.addSigma('1');
-    // assertTrue(dfa.addState("a"));
-    // dfa.addState("b");
-    // dfa.setStart("a");
-    // assertTrue(dfa.setFinal("b"));
-
-    // dfa.addState("a");
-    // dfa.setStart("c");
-    // dfa.setFinal("c");
-
-    // dfa.addTransition("a", "a", '0');
-    // dfa.addTransition("a", "b", '1');
-    // dfa.addTransition("b", "a", '0');
-    // dfa.addTransition("b", "b", '1');
-
-    // dfa.addTransition("c", "b", '1');
-    // dfa.addTransition("a", "c", '1');
-    // dfa.addTransition("a", "b", '2');
-
-    // String dfaStr = dfa.toString();
-
-    // System.out.println(dfaStr);
-
-    // System.out.println(dfa.deltaString());
-
-    // }
 
 }
