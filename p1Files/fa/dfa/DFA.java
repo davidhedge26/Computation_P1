@@ -112,19 +112,20 @@ public class DFA implements DFAInterface {
             try {
                 char x = s.charAt(n);
 
-                // Is the character valid?
+                // Does the character reference a valid transition?
                 if (!iter.containsTran(x)){
                     return false;
                 }
 
+                // Have we reached the end of the string? Does the string actually go to a valid state?
                 iter = getState(iter.next(x));
                 if ((iter != null) && (n == s.length()-1)){
-                    boolean result = isFinal(iter.getName());
-                    return result;
-                    // return isFinal(iter.getName());
+                    // Is the last state reached a valid final state?
+                    return isFinal(iter.getName());
                 }
             } catch (IndexOutOfBoundsException e){
-                return false;
+                // For when the string never reaches a final state and runs out of characters
+                return false; 
             }
         }
         return false;
@@ -229,13 +230,14 @@ public class DFA implements DFAInterface {
      */
     @Override
     public DFA swap(char symb1, char symb2) {
+        // Instantiate a new DFA with given sigmas
         DFA copy = new DFA();
         copy.addSigma(symb1);
         copy.addSigma(symb2);
-
+        
         Iterator<DFAState> iter = states.iterator();
         while (iter.hasNext()) {
-            // Grab next state and make it initial or final if it is so
+            // Grab next state and make it initial or final in copy if it is so in the original DFA
             DFAState next = iter.next();
             String name = next.getName();
             copy.addState(name);
@@ -246,13 +248,14 @@ public class DFA implements DFAInterface {
                 copy.setStart(name);
             }
         }
+        // Iterate through all states again to add swapped transitions
         iter = states.iterator();
         while (iter.hasNext()){
             DFAState next = iter.next();
             String name = next.getName();
             // Add reversed transitions into states
             if (next.containsTran(symb1)){
-                copy.addTransition(name, next.next(symb1), symb2);
+                copy.addTransition(name, next.next(symb1), symb2); 
             }
             if (next.containsTran(symb2)){
                 copy.addTransition(name, next.next(symb2), symb1);
