@@ -318,30 +318,39 @@ public class DFA implements DFAInterface {
     }
 
     // helper function to toString the delta structure
+    // needs to retrieve the keys in order of the states
     public String deltaString() {
         // sb will be our alphabet title
         // sl will be the state transition printout
         // two string builders, one map iteration
         StringBuilder sb = new StringBuilder();
         StringBuilder sl = new StringBuilder();
+        // append alphabet as header
         for (Character alphabet : sigma) {
             sb.append(" " + alphabet);
         }
         sb.append("\n");
-
-        for (Map.Entry<DFAState, HashMap<Character, DFAState>> entry : transitionState.entrySet()) {
-            sl.append(" " + entry.getKey());
-            HashMap<Character, DFAState> innerMap = entry.getValue();
-            for (HashMap.Entry<Character, DFAState> iter : innerMap.entrySet()) {
-                sl.append(" " + iter.getValue());
+        // need to retrieve table items, in order of the states
+        // loop through states
+        // append from transition table
+        for (DFAState temp : states) {
+            for (Map.Entry<DFAState, HashMap<Character, DFAState>> entry : transitionState.entrySet()) {
+                if (entry.getKey() == temp) {
+                    sl.append(" " + temp.toString());
+                    HashMap<Character, DFAState> innerMap = entry.getValue();
+                    for (Character bet : sigma) {
+                        for (HashMap.Entry<Character, DFAState> iter : innerMap.entrySet()) {
+                            if (iter.getKey() == bet)
+                                sl.append(" " + iter.getValue());
+                        }
+                    }
+                    sl.append("\n");
+                }
 
             }
-            sl.append("\n");
         }
         sb.append(sl.toString());
-
         return sb.toString();
-
     }
 
 }
