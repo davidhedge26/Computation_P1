@@ -396,4 +396,210 @@ public class DFATest {
 		System.out.println("dfa3Swap accept pass");
 	}
 
+
+	private DFA stress() {
+		DFA dfa = new DFA();
+		dfa.addSigma('a');
+		dfa.addSigma('b');
+		dfa.addSigma('c');
+
+		assertTrue(dfa.addState("s0"));
+		assertTrue(dfa.addState("q0"));
+		assertTrue(dfa.addState("q1"));
+		assertTrue(dfa.addState("q2"));
+		assertTrue(dfa.addState("q3"));
+		assertTrue(dfa.addState("r0"));
+		assertTrue(dfa.addState("r1"));
+		assertTrue(dfa.addState("r2"));
+		assertTrue(dfa.addState("r3"));
+		assertFalse(dfa.addState("r1"));
+
+		assertTrue(dfa.setFinal("q2"));
+		assertTrue(dfa.setFinal("r2"));
+		assertTrue(dfa.setFinal("s0"));
+
+		assertTrue(dfa.setStart("s0"));
+		assertTrue(dfa.setStart("r1"));
+		assertTrue(dfa.setStart("s0"));
+
+		assertTrue(dfa.addState("B"));
+		assertTrue(dfa.addState("C"));
+		assertTrue(dfa.addState("E"));
+		assertTrue(dfa.addState("F"));
+
+		assertFalse(dfa.addState("q0"));
+		assertFalse(dfa.setFinal("w0"));
+		assertFalse(dfa.setStart("DQ"));
+
+		assertTrue(dfa.addTransition("s0", "q0", 'c'));
+		assertTrue(dfa.addTransition("q0", "q1", 'a'));
+		assertTrue(dfa.addTransition("q1", "q2", 'b'));
+		assertTrue(dfa.addTransition("q2", "q3", 'a'));
+		assertTrue(dfa.addTransition("q3", "q2", 'b'));
+		assertTrue(dfa.addTransition("q2", "s0", 'c'));
+
+		assertTrue(dfa.addTransition("s0", "r0", 'a'));
+		assertTrue(dfa.addTransition("r0", "r1", 'a'));
+		assertTrue(dfa.addTransition("r1", "r2", 'b'));
+		assertTrue(dfa.addTransition("r2", "r3", 'a'));
+		assertTrue(dfa.addTransition("r3", "r2", 'b'));
+		assertTrue(dfa.addTransition("r2", "s0", 'c'));
+
+		assertFalse(dfa.addTransition("FF", "F", 'a'));
+		assertFalse(dfa.addTransition("F", "GG", 'b'));
+
+		assertFalse(dfa.addTransition("G", "F", 'K'));
+		assertFalse(dfa.addTransition("A", "K", '7'));
+
+		return dfa;
+	}
+
+	@Test
+	public void testStress_1() {
+		DFA dfa = stress();
+
+		System.out.println("dfa3 instantiation pass");
+	}
+
+	@Test
+	public void testStress_2() {
+		DFA dfa = stress();
+		assertNotNull(dfa.getState("q0"));
+		assertNull(dfa.getState("n0"));
+		assertEquals(dfa.getState("r2").getName(), "r2");
+		assertTrue(dfa.isStart("s0"));
+		assertFalse(dfa.isStart("q3"));
+		assertNotNull(dfa.getState("q1"));
+		assertEquals(dfa.getState("q1").getName(), "q1");
+		assertTrue(dfa.isFinal("s0"));
+		assertTrue(dfa.isFinal("q2"));
+		assertTrue(dfa.isFinal("r2"));
+		assertFalse(dfa.isFinal("q3"));
+		assertEquals(dfa.getSigma(), Set.of('a', 'b', 'c'));
+
+		System.out.println("dfa3 correctness pass");
+	}
+	
+	@Test
+	public void testStress_3() {
+		DFA dfa = stress();
+		assertTrue(dfa.accepts("cab")); // reach q2 as final
+		assertTrue(dfa.accepts("aababab")); // reach r2 as final
+		assertTrue(dfa.accepts("aabababc")); // reach s0 as final
+		assertTrue(dfa.accepts("aabababababccabababc")); // full loop. Reach q2
+		assertFalse(dfa.accepts("b"));
+		assertFalse(dfa.accepts("12"));
+
+		System.out.println("dfa3 accept pass");
+	}
+
+
+	
+	private DFA stressSwappable() {
+		DFA dfa = new DFA();
+		dfa.addSigma('a');
+		dfa.addSigma('b');
+
+		assertTrue(dfa.addState("s0"));
+		assertTrue(dfa.addState("q0"));
+		assertTrue(dfa.addState("q1"));
+		assertTrue(dfa.addState("q2"));
+		assertTrue(dfa.addState("q3"));
+		assertTrue(dfa.addState("r0"));
+		assertTrue(dfa.addState("r1"));
+		assertTrue(dfa.addState("r2"));
+		assertTrue(dfa.addState("r3"));
+		assertFalse(dfa.addState("r1"));
+
+		assertTrue(dfa.setFinal("q2"));
+		assertTrue(dfa.setFinal("r2"));
+		assertTrue(dfa.setFinal("s0"));
+
+		assertTrue(dfa.setStart("s0"));
+		assertTrue(dfa.setStart("r1"));
+		assertTrue(dfa.setStart("s0"));
+
+		assertTrue(dfa.addState("B"));
+		assertTrue(dfa.addState("C"));
+		assertTrue(dfa.addState("E"));
+		assertTrue(dfa.addState("F"));
+
+		assertFalse(dfa.addState("q0"));
+		assertFalse(dfa.setFinal("w0"));
+		assertFalse(dfa.setStart("DQ"));
+
+		assertTrue(dfa.addTransition("s0", "q0", 'b'));
+		assertTrue(dfa.addTransition("q0", "q1", 'a'));
+		assertTrue(dfa.addTransition("q1", "q2", 'b'));
+		assertTrue(dfa.addTransition("q2", "q3", 'a'));
+		assertTrue(dfa.addTransition("q3", "q2", 'b'));
+		assertTrue(dfa.addTransition("q2", "s0", 'b'));
+
+		assertTrue(dfa.addTransition("s0", "r0", 'a'));
+		assertTrue(dfa.addTransition("r0", "r1", 'a'));
+		assertTrue(dfa.addTransition("r1", "r2", 'b'));
+		assertTrue(dfa.addTransition("r2", "r3", 'a'));
+		assertTrue(dfa.addTransition("r3", "r2", 'b'));
+		assertTrue(dfa.addTransition("r2", "s0", 'b'));
+
+		assertFalse(dfa.addTransition("FF", "F", 'a'));
+		assertFalse(dfa.addTransition("F", "GG", 'b'));
+
+		assertFalse(dfa.addTransition("G", "F", 'K'));
+		assertFalse(dfa.addTransition("A", "K", '7'));
+
+		return dfa;
+	}
+
+	@Test
+	public void testStress2_1() {
+		DFA dfa = stressSwappable();
+
+		System.out.println("dfa3 instantiation pass");
+	}
+
+	@Test
+	public void testStress2_2() {
+		DFA dfa = stressSwappable();
+		assertNotNull(dfa.getState("q0"));
+		assertNull(dfa.getState("n0"));
+		assertEquals(dfa.getState("r2").getName(), "r2");
+		assertTrue(dfa.isStart("s0"));
+		assertFalse(dfa.isStart("q3"));
+		assertNotNull(dfa.getState("q1"));
+		assertEquals(dfa.getState("q1").getName(), "q1");
+		assertTrue(dfa.isFinal("s0"));
+		assertTrue(dfa.isFinal("q2"));
+		assertTrue(dfa.isFinal("r2"));
+		assertFalse(dfa.isFinal("q3"));
+		assertEquals(dfa.getSigma(), Set.of('a', 'b'));
+
+		System.out.println("dfa3 correctness pass");
+	}
+
+	@Test
+	public void testStress2_5() {
+		DFA dfa = stressSwappable();
+		DFA dfaSwap = dfa.swap('a', 'b');
+		assertTrue(dfa != dfaSwap);
+		assertTrue(dfa.getState("q0") != dfaSwap.getState("q0"));
+		assertTrue(dfa.getState("s0") != dfaSwap.getState("s0"));
+		assertTrue(dfa.getState("r3") != dfaSwap.getState("r3"));
+		assertEquals(dfa.isStart("s0"), dfaSwap.isStart("s0"));
+		assertEquals(dfa.isFinal("s0"), dfaSwap.isFinal("s0"));
+		assertEquals(dfa.isFinal("q2"), dfaSwap.isFinal("q2"));
+		assertEquals(dfa.isFinal("r2"), dfaSwap.isFinal("r2"));
+
+		// transitions of the original dfa should not change
+		assertTrue(dfa.accepts("aab"));
+		assertTrue(dfaSwap.accepts("bba"));
+		assertTrue(dfaSwap.accepts("bbababa")); // reach r2 as final
+		assertTrue(dfaSwap.accepts("bbababaa")); // reach s0 as final
+		assertTrue(dfaSwap.accepts("bbababababaaabababa")); // full loop. Reach r2
+		assertFalse(dfa.accepts("bbababababaaabababa")); // full loop. Reach r2
+		assertFalse(dfa.accepts("b"));
+		assertFalse(dfa.accepts("12"));
+
+		System.out.println("df31Swap instantiation pass");
+	}
 }
