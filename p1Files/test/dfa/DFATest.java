@@ -74,7 +74,6 @@ public class DFATest {
 	public void test1_4() {
 
 		DFA dfa = dfa1();
-		System.out.println(dfa.toString());
 
 		String dfaStr = dfa.toString();
 		String expStr = " Q = { a b }\n"
@@ -197,7 +196,6 @@ public class DFATest {
 	@Test
 	public void test2_4() {
 		DFA dfa = dfa2();
-		System.out.println(dfa.toString());
 		String dfaStr = dfa.toString();
 		String expStr = "Q = { 3 0 1 2 }\n"
 				+ "Sigma = { 0 1 }\n"
@@ -345,7 +343,6 @@ public class DFATest {
 	@Test
 	public void test3_4() {
 		DFA dfa = dfa3();
-		System.out.println(dfa.toString());
 		String dfaStr = dfa.toString();
 		String expStr = "Q={GDABCEF}\n"
 				+ "Sigma = {2 1}\n"
