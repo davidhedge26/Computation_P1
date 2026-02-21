@@ -9,12 +9,14 @@ Java program, builds, modifies, and runs Definite finite automata.
 INCLUDED FILES:
 List the files required for the project with a brief
 explanation of why each is included.
+
 e.g.
 * DFAinterface.java - source file
 * FAInterface.java - source file
 * DFAState.java - node core
 * DFA.java - State machine core
 * README - this file
+
 COMPILING AND RUNNING:
 Give the command for compiling the program, the command
 for running the program, and any usage instructions the
@@ -30,13 +32,32 @@ driver class (and all dependencies) with the command:
 $ javac Class1.java
 Run the compiled class file with the command:
 $ java Class1
-Console output will give the results after the program finishes.
+
+The j-unit test cases will output test results of various DFA objects.
 PROGRAM DESIGN AND IMPORTANT CONCEPTS:
-This is the sort of information someone who really wants to
-understand your program - possibly to make future enhancements -
-would want to know.
-Explain the main concepts and organization of your program so that
-the reader can understand how your program works. This is not a repeat
+
+Program Is a definitive finite automata. The core strucutre of a DFA relies on the five tuple.
+
+The program is for the class named DFA, this consists of 5 object structures or tuples. States,alphabet,start state, final state, transition table. It was important in the instructions that the structures maintained ordering. In the 5 tuples, you will see a lot of linked hash sets, and linked hash maps to ensure, order is maintained.
+
+The transitionState nested map structure was used to represent the delta structure of the transition table. It was important to be cautious about structure selection inorder to achieve long term, modularity between the State and the DFAState object, and all the interface objects. Object orientation and careful data structure selection, along with an object oriented approach in the code logic, ensured the early test cases were relatively simple to troubleshoot.
+
+The class object DFA is a concrete implementation for DFAinterface. Key methods were implemented: toString, addTransition, and swap from the interface, in addition to helper methods needed. 
+
+Most of the methods consist of interating through one of the 5-tuple data structures, but then when it comes to some print statements, careful checking on how the ordering in the states set is important in the printout of the delta data structure object. Many methods work similarly where a condition is checked whether some object structure has a certain item, and something is added, or something is returned.
+
+It was important to expand on the junit test cases and see if our DFA implementation could handle more transition states, or more swaps.
+
+
+
+
+
+
+
+
+
+
+
 of javadoc comments or an exhaustive listing of all methods, but an
 explanation of the critical algorithms and object interactions that make
 up the program.
