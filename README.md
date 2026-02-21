@@ -35,9 +35,9 @@ The class object DFA is a concrete implementation for DFAinterface. Key methods 
 
 Most of the methods consist of interating through one of the 5-tuple data structures, but then when it comes to some print statements, careful checking on how the ordering in the states set is important in the printout of the delta data structure object. Many methods work similarly where a condition is checked whether some object structure has a certain item, and something is added, or something is returned.
 
-It was important to expand on the junit test cases and see if our DFA implementation could handle more transition states, or more swaps.
 
 ## TESTING:
+It was important to expand on the junit test cases and see if our DFA implementation could handle more transition states, or more swaps.
 Junit was used to test this program by ensuring functionality of each
 broad function in DFA.java. Then Junit was used to ensure that function 
 worked on DFA of any size.
@@ -48,12 +48,15 @@ No major problems noted. Swap only works on machines with 2 accepted transitions
 David Hedge -> I had trouble at first learning how everything was supposed to click together
 in this project but after I figured out the broader picture the project gained a flow.
 
+The delta structure for the transition state table seemed to be a real sticking point that was worth while, because of how effective of an object it is in storing what is happening in the machine as a whole.
+
 ## EXTRA CREDIT:
 If the project had opportunities for extra credit that you attempted,
 be sure to call it out so the grader does not overlook it.
 
 ## SOURCES:
 David Hedge -> no sources used.
+Jared Guidry -> AI consulted for java conceptual understanding, and not for project code generation.
 --------------------------------------------------------------------------
 --
 All content in a README file is expected to be written in clear English
