@@ -19,22 +19,10 @@ e.g.
 * README - this file
 
 ## COMPILING AND RUNNING:
-Give the command for compiling the program, the command
-for running the program, and any usage instructions the
-user needs.
-These are command-line instructions for a system like onyx.
-They have nothing to do with Eclipse or any other IDE. They
-must be specific - assume the user has Java installed, but
-has no idea how to compile or run a Java program from the
-command-line.
-e.g.
-From the directory containing all source files, compile the
-driver class (and all dependencies) with the command:
-$ javac Class1.java
-Run the compiled class file with the command:
-$ java Class1
-
-The j-unit test cases will output test results of various DFA objects.
+Compile by running the below command in directories "fa" and "fa/dfa"
+* javac *.java
+Then dfa can be run through DFATest.java directly.
+Otherwise DFA is a support program run in conjunction with another program.
 
 ## PROGRAM DESIGN AND IMPORTANT CONCEPTS:
 Program Is a definitive finite automata. The core strucutre of a DFA relies on the five tuple.
