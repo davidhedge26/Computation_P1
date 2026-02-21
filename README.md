@@ -1,5 +1,5 @@
 ****************
-* P1 DFA - David Hedge, and Jared Guidry
+* P1 DFA 
 * Class - CS 361 Theory of Computation
 * Date - 02-20-26
 * Your name - David Hedge and Jared Guidry
