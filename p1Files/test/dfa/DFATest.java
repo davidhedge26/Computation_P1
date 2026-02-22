@@ -380,7 +380,7 @@ public class DFATest {
 		assertFalse(dfa.accepts("2"));
 		assertFalse(dfa.accepts("1212"));
 
-		System.out.println("df31Swap instantiation pass");
+		System.out.println("test3_5Swap instantiation pass");
 	}
 
 	@Test
@@ -393,7 +393,7 @@ public class DFATest {
 		assertFalse(dfaSwap.accepts("1"));
 		assertFalse(dfaSwap.accepts("2121"));
 
-		System.out.println("dfa3Swap accept pass");
+		System.out.println("dfa3_6 Swap accept pass");
 	}
 
 	private DFA stress() {
@@ -457,7 +457,7 @@ public class DFATest {
 	public void testStress_1() {
 		DFA dfa = stress();
 
-		System.out.println("dfa3 instantiation pass");
+		System.out.println("testStress_1 instantiation pass");
 	}
 
 	@Test
@@ -476,7 +476,7 @@ public class DFATest {
 		assertFalse(dfa.isFinal("q3"));
 		assertEquals(dfa.getSigma(), Set.of('a', 'b', 'c'));
 
-		System.out.println("dfa3 correctness pass");
+		System.out.println("testStress_2 correctness pass");
 	}
 
 	@Test
@@ -489,7 +489,7 @@ public class DFATest {
 		assertFalse(dfa.accepts("b"));
 		assertFalse(dfa.accepts("12"));
 
-		System.out.println("dfa3 accept pass");
+		System.out.println("testStress_3 accept pass");
 	}
 
 	@Test
@@ -576,7 +576,7 @@ public class DFATest {
 	public void testStress2_1() {
 		DFA dfa = stressSwappable();
 
-		System.out.println("dfa3 instantiation pass");
+		System.out.println("testStress2_1 instantiation pass");
 	}
 
 	@Test
@@ -595,7 +595,7 @@ public class DFATest {
 		assertFalse(dfa.isFinal("q3"));
 		assertEquals(dfa.getSigma(), Set.of('a', 'b'));
 
-		System.out.println("dfa3 correctness pass");
+		System.out.println("testStress2_2 correct pass");
 	}
 
 	@Test
@@ -621,6 +621,6 @@ public class DFATest {
 		assertFalse(dfa.accepts("b"));
 		assertFalse(dfa.accepts("12"));
 
-		System.out.println("df31Swap instantiation pass");
+		System.out.println("testStress2_5 accept pass");
 	}
 }
