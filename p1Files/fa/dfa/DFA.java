@@ -15,14 +15,16 @@ import java.util.Set;
  */
 public class DFA implements DFAInterface {
 
-    // 5 tuple:
-    // sigma is the alphabet
-    // states are the dfa state objects that currently just hold a name for a state
-    // init is just 1 singular dfa state
-    // final state is set as there could be multiple
-    // using Linked Hash versions of sets because these preserve order
-    // inner map uses character as key, dfa rules
-    // outter map results in end transition to next state
+    /**
+     * 5 tuple:
+     * sigma is the alphabet
+     * states are the dfa state objects that currently just hold a name for a state
+     * init is just 1 singular dfa state
+     * final state is set as there could be multiple
+     * using Linked Hash versions of sets because these preserve order
+     * inner map uses character as key, dfa rules
+     * outter map results in end transition to next state
+     */
     private LinkedHashSet<Character> sigma = new LinkedHashSet<>();
     private LinkedHashSet<DFAState> states = new LinkedHashSet<>();
     private DFAState init = new DFAState(null);
@@ -317,8 +319,18 @@ public class DFA implements DFAInterface {
         return sb.toString();
     }
 
-    // helper function to toString the delta structure
-    // needs to retrieve the keys in order of the states
+    /**
+     * helper function to toString the delta structure
+     * needs to return the transition list
+     * in the order of the states
+     * needs to print the results in the order of the alphabet
+     * 
+     * @param none
+     * @return Delta Structure String
+     * 
+     * 
+     */
+
     public String deltaString() {
         // sb will be our alphabet title
         // sl will be the state transition printout

@@ -10,7 +10,7 @@ import fa.dfa.DFA;
 
 public class DFATest {
 
-	// ------------------- dfa1 tests ----------------------//
+	// ------------------- dfa1 tests ----------------------/
 	private DFA dfa1() {
 		DFA dfa = new DFA();
 		dfa.addSigma('0');
@@ -396,7 +396,6 @@ public class DFATest {
 		System.out.println("dfa3Swap accept pass");
 	}
 
-
 	private DFA stress() {
 		DFA dfa = new DFA();
 		dfa.addSigma('a');
@@ -479,7 +478,7 @@ public class DFATest {
 
 		System.out.println("dfa3 correctness pass");
 	}
-	
+
 	@Test
 	public void testStress_3() {
 		DFA dfa = stress();
@@ -493,8 +492,30 @@ public class DFATest {
 		System.out.println("dfa3 accept pass");
 	}
 
+	@Test
+	public void testStress_4() {
+		DFA dfa = stress();
+		String dfaStr = dfa.toString();
+		String expStr = "Q={s0 q0 q1 q2 q3 r0 r1 r2 r3 B C E F }\n"
+				+ "Sigma = {a b c}\n"
+				+ "delta =\n"
+				+ "	a b c\n"
+				+ "s0	r0	q0\n"
+				+ "q0	q1	\n"
+				+ "q1	q2  \n"
+				+ "q2	q3 	s0 \n"
+				+ "q3 	q2  \n"
+				+ "r0	r1	\n"
+				+ "r1	r2	\n"
+				+ "r2	r3	s0\n"
+				+ "r3 r2 \n"
+				+ "q0 = s0\n"
+				+ "F = {q2 r2 s0}\n";
 
-	
+		assertTrue(dfaStr.replaceAll("\\s", "").equals(expStr.replaceAll("\\s", "")));
+		System.out.println("testStress toString pass");
+	}
+
 	private DFA stressSwappable() {
 		DFA dfa = new DFA();
 		dfa.addSigma('a');
