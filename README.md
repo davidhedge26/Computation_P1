@@ -46,24 +46,16 @@ worked on DFA of any size.
 No major problems noted. Swap only works on machines with 2 accepted transitions.
 
 David Hedge -> I had trouble at first learning how everything was supposed to click together
-in this project but after I figured out the broader picture the project gained a flow.
-
-The delta structure for the transition state table seemed to be a real sticking point that was worth while, because of how effective of an object it is in storing what is happening in the machine as a whole.
-
+in this project but after I figured out the broader picture the project gained a flow.  
+  
+Jared Guidry -> The delta structure for the transition state table seemed to be a real sticking point that was worth while, because of how effective of an object it is in storing what is happening in the machine as a whole. I just had trouble figuring out how to get it to store and access what we needed, the logic checking what goes in and when, was not that difficult.   
+  
 ## EXTRA CREDIT:
 If the project had opportunities for extra credit that you attempted,
 be sure to call it out so the grader does not overlook it.
 
 ## SOURCES:
-David Hedge -> no sources used.
-Jared Guidry -> AI consulted for java conceptual understanding, and not for project code generation.
---------------------------------------------------------------------------
---
-All content in a README file is expected to be written in clear English
-with
-proper grammar, spelling, and punctuation. If you are not a strong writer,
-be sure to get someone else to help you with proofreading. Consider all
-project
-documentation to be professional writing for your boss and/or potential
-customers.
-Annotations
+David Hedge -> no sources used.  
+Jared Guidry -> AI consulted for java conceptual understanding, and not for project code generation.  
+----------------------------------------------------------------------------
+
