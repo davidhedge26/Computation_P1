@@ -1,6 +1,16 @@
 package fa.nfa;
 
-public class NFA implements NFAinterface {
+import java.util.LinkedHashSet;
+import java.util.Map;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Set;
+
+import fa.dfa.DFAState;
+
+public class NFA implements NFAInterface {
 
     /**
      * new methods from interface
@@ -85,6 +95,41 @@ public class NFA implements NFAinterface {
     }
 
     /**
+     * Simulates a DFA on input s to determine
+     * whether the DFA accepts s.
+     * 
+     * @param s - the input string
+     * @return true if s in the language of the DFA and false otherwise
+     */
+    @Override
+    public boolean accepts(String s) {
+        NFAState iter = init;
+        boolean fin = true;
+        for (int n = 0; fin == true; n++) {
+            try {
+                char x = s.charAt(n);
+
+                // Does the character reference a valid transition?
+                if (!iter.containsTran(x)) {
+                    return false;
+                }
+
+                // Have we reached the end of the string? Does the string actually go to a valid
+                // state?
+                iter = getState(iter.next(x));
+                if ((iter != null) && (n == s.length() - 1)) {
+                    // Is the last state reached a valid final state?
+                    return isFinal(iter.getName());
+                }
+            } catch (IndexOutOfBoundsException e) {
+                // For when the string never reaches a final state and runs out of characters
+                return false;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Adds a symbol to Sigma
      * 
      * @param symbol to add to the alphabet set
@@ -152,29 +197,20 @@ public class NFA implements NFAinterface {
      *         symbol in not in the alphabet
      */
     @Override
-    public boolean addTransition(String fromState, String toState, char onSymb) {
+    public boolean addTransition(NFAState fromState, NFAState toState, char onSymb) {
         // check if transition exists in alphabet
         if (!sigma.contains(onSymb))
             return false;
-
-        if (getState(toState) == null)
+        if (getState(toState.toString()) == null)
             return false;
-
-        Iterator<NFAState> iter = states.iterator();
-        while (iter.hasNext()) {
-            NFAState check = iter.next();
-            if (check.getName().equals(fromState)) {
-                // check if entry created in map, create new, else add transition to it:
-                NFAState from = getState(fromState);
-                NFAState to = getState(toState);
-                if (!transitionState.containsKey(from)) {
-                    transitionState.put(from, new HashMap<>());
-                    transitionState.get(from).put(onSymb, to);
-                } else {
-                    transitionState.get(from).put(onSymb, to);
-                }
-                return true;
+        if (!containTrans(fromState, toState, onSymb)) {
+            if (!transitionState.containsKey(fromState)) {
+                transitionState.put(fromState, new HashMap<>());
+                transitionState.get(fromState).put(onSymb, toState);
+            } else {
+                transitionState.get(fromState).put(onSymb, toState);
             }
+            return true;
         }
         // Runs only when no state is found with the same name as given fromState
         return false;
@@ -298,6 +334,26 @@ public class NFA implements NFAinterface {
         }
         sb.append(sl.toString());
         return sb.toString();
+    }
+
+    public boolean containTrans(NFAState from, NFAState to, char Symbol) {
+
+        // loop outer keys
+        for (Map.Entry<NFAState, HashMap<Character, NFAState>> entry : transitionState.entrySet()) {
+            if (entry.getKey() == from) {
+                HashMap<Character, NFAState> innerMap = entry.getValue();
+                for (HashMap.Entry<Character, NFAState> iter : innerMap.entrySet()) {
+                    if (iter.getKey() == Symbol) {
+                        if (iter.getValue() == to) {
+                            return true;
+                        }
+                    }
+                }
+
+            }
+
+        }
+        return false;
     }
 
     /**
