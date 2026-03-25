@@ -103,29 +103,6 @@ public class NFA implements NFAInterface {
      */
     @Override
     public boolean accepts(String s) {
-        NFAState iter = init;
-        boolean fin = true;
-        for (int n = 0; fin == true; n++) {
-            try {
-                char x = s.charAt(n);
-
-                // Does the character reference a valid transition?
-                if (!iter.containsTran(x)) {
-                    return false;
-                }
-
-                // Have we reached the end of the string? Does the string actually go to a valid
-                // state?
-                iter = getState(iter.next(x));
-                if ((iter != null) && (n == s.length() - 1)) {
-                    // Is the last state reached a valid final state?
-                    return isFinal(iter.getName());
-                }
-            } catch (IndexOutOfBoundsException e) {
-                // For when the string never reaches a final state and runs out of characters
-                return false;
-            }
-        }
         return false;
     }
 
@@ -161,7 +138,7 @@ public class NFA implements NFAInterface {
             if (iter.toString().equalsIgnoreCase(name))
                 return iter;
         }
-        return null;
+        return new NFAState();
     }
 
     /**
@@ -197,26 +174,20 @@ public class NFA implements NFAInterface {
      *         symbol in not in the alphabet
      */
     @Override
-    public boolean addTransition(NFAState fromState, NFAState toState, char onSymb) {
-        // check if transition exists in alphabet
-        if (!sigma.contains(onSymb))
+    public boolean addTransition(String fromState, Set<String> toStates, char onSymb) {
+        // Check if toStates is not nothing
+        if (toStates.size() == 0)
             return false;
-        if (getState(toState.toString()) == null)
-            return false;
-        if (!containTrans(fromState, toState, onSymb)) {
-            if (!transitionState.containsKey(fromState)) {
-                transitionState.put(fromState, new HashMap<>());
-                transitionState.get(fromState).put(onSymb, toState);
-            } else {
-                transitionState.get(fromState).put(onSymb, toState);
-            }
-            return true;
+        
+        if (!transitionState.containsKey(fromState)) {
+            transitionState.put(getState(fromState), new HashMap<>());
+            transitionState.get(fromState).put(onSymb, toStates);
+        } else {
+            transitionState.get(fromState).put(onSymb, toStates);
         }
-        // Runs only when no state is found with the same name as given fromState
-        return false;
+        return true;
     }
 
-    @Override
     public NFA swap(char symb1, char symb2) {
         // Instantiate a new NFA with given sigmas
         NFA copy = new NFA();
@@ -243,10 +214,10 @@ public class NFA implements NFAInterface {
             NFAState next = iter.next();
             String name = next.getName();
             // Add reversed transitions into states
-            if (next.containsTran(symb1)) {
+            if (next.containsTrans(symb1)) {
                 copy.addTransition(name, next.next(symb1), symb2);
             }
-            if (next.containsTran(symb2)) {
+            if (next.containsTrans(symb2)) {
                 copy.addTransition(name, next.next(symb2), symb1);
             }
         }
@@ -336,8 +307,7 @@ public class NFA implements NFAInterface {
         return sb.toString();
     }
 
-    public boolean containTrans(NFAState from, NFAState to, char Symbol) {
-
+    public boolean containsTrans(NFAState from, NFAState to, char Symbol) {
         // loop outer keys
         for (Map.Entry<NFAState, HashMap<Character, NFAState>> entry : transitionState.entrySet()) {
             if (entry.getKey() == from) {
@@ -364,6 +334,7 @@ public class NFA implements NFAInterface {
      * @return a set of sink states
      */
     public Set<NFAState> getToState(NFAState from, char onSymb) {
+
     }
 
     /**
@@ -397,5 +368,4 @@ public class NFA implements NFAInterface {
     public boolean isDFA() {
 
     }
-
 }
