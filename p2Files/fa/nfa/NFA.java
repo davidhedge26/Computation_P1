@@ -113,7 +113,11 @@ public class NFA implements NFAInterface {
      */
     @Override
     public void addSigma(char symbol) {
-        sigma.add(symbol);
+        if (symbol == 'e'){
+            // do nothing, e is reserved for epsilon transitions
+        } else{
+            sigma.add(symbol);
+        }
     }
 
     /**
@@ -188,6 +192,13 @@ public class NFA implements NFAInterface {
         return true;
     }
 
+    /**
+     * Creates a deep copy of this NFA
+     * which transitions labels are
+     * swapped between symb1 & symb2.
+     * 
+     * @return a copy of this DFA
+     */
     public NFA swap(char symb1, char symb2) {
         // Instantiate a new NFA with given sigmas
         NFA copy = new NFA();
@@ -214,7 +225,7 @@ public class NFA implements NFAInterface {
             NFAState next = iter.next();
             String name = next.getName();
             // Add reversed transitions into states
-            if (next.containsTrans(symb1)) {
+            if (next.containsTrans(next, iter.next(), symb1)) {
                 copy.addTransition(name, next.next(symb1), symb2);
             }
             if (next.containsTrans(symb2)) {
@@ -334,7 +345,21 @@ public class NFA implements NFAInterface {
      * @return a set of sink states
      */
     public Set<NFAState> getToState(NFAState from, char onSymb) {
+        Set<NFAState> retval = new LinkedHashSet<NFAState>();
+        Iterator<NFAState> iter = states.iterator();
 
+        // The symbol given is not a valid transition
+        if (!sigma.contains(onSymb)) 
+            return null;
+
+        while (iter.hasNext()){
+            NFAState next = iter.next();
+            if (containsTrans(from, next, onSymb)){
+                retval.add(next);
+            }
+        }
+
+        return retval;
     }
 
     /**
@@ -346,7 +371,19 @@ public class NFA implements NFAInterface {
      */
 
     public Set<NFAState> eClosure(NFAState s) {
+        Set<NFAState> retval = new LinkedHashSet<NFAState>();
 
+        // run through state connected by s via 'e' and add each one to retval
+        // once no states are reachable end function
+        Set<NFAState> reachable = getToState(s, 'e');
+        retval.addAll(reachable);
+        Iterator<NFAState> iter = reachable.iterator();
+        while (iter.hasNext()){
+            NFAState next = iter.next();
+            retval.addAll(eClosure(next)); // addALL ignores duplicates (or at least it should as stated in its documentation)
+        }
+
+        return retval;
     }
 
     /**
@@ -366,6 +403,25 @@ public class NFA implements NFAInterface {
      * @return - true if NFA's transition function has DFA's properties.
      */
     public boolean isDFA() {
+        // keywords "returns true if NFA functions contain DFA's properties."
+        // I do not believe here we have to convert NFA to DFA.
+        // Proof by contradiction used, then
 
+        // Does NFA have transitions leading to multiple states?
+        Iterator<NFAState> iter = states.iterator();
+        Iterator<Character> transition = sigma.iterator();
+        while (iter.hasNext()){
+            NFAState next = iter.next();
+            // State contatins an epsilon transition and cannot be a DFA
+            if (getToState(next, 'e').size() == 0) return false; 
+
+            while (transition.hasNext()){
+                char trans = transition.next();
+                // State has multiple destinations on the same transition and cannot be a DFA
+                if (getToState(next, trans).size() > 1) return false;
+            }
+        }
+
+        return true;
     }
 }
