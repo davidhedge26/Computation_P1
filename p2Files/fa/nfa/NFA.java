@@ -113,6 +113,9 @@ public class NFA implements NFAInterface {
      */
     @Override
     public void addSigma(char symbol) {
+        if (!sigma.contains('e')){
+            sigma.add('e');
+        }
         if (symbol == 'e'){
             // do nothing, e is reserved for epsilon transitions
         } else{
@@ -142,7 +145,8 @@ public class NFA implements NFAInterface {
             if (iter.toString().equalsIgnoreCase(name))
                 return iter;
         }
-        return new NFAState();
+        return null;
+        //return new NFAState();
     }
 
     /**
@@ -183,6 +187,14 @@ public class NFA implements NFAInterface {
         if (toStates.size() == 0)
             return false;
         
+        // Check if fromState isn't registered as a valid state
+        if (getState(fromState) == null) 
+            return false;
+
+        // Check if onSymb is registered as a valid transition
+        if (!sigma.contains(onSymb))
+            return false;
+
         Character charToAdd = onSymb;
         if (!transitionState.containsKey(fromState)) {
             transitionState.put(getState(fromState), new HashMap<>());
@@ -191,13 +203,15 @@ public class NFA implements NFAInterface {
             Iterator<String> iter = toStates.iterator();
             while (iter.hasNext()){
                 NFAState next = getState(iter.next());
-                transitionState.get(fromState).put(charToAdd, next);
+                if (!states.contains(next)) // Check if current toState exists as a valid state
+                    return false;
+                transitionState.get(getState(fromState)).put(charToAdd, next);
             }
         } else {
             Iterator<String> iter = toStates.iterator();
             while (iter.hasNext()){
                 NFAState next = getState(iter.next());
-                transitionState.get(fromState).put(charToAdd, next);
+                transitionState.get(getState(fromState)).put(charToAdd, next);
             }
         }
         return true;
