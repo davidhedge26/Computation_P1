@@ -225,11 +225,7 @@ public class NFA implements NFAInterface {
                 return false;
             toAdd.add(next);
         }
-        
         transitionState.get(getState(fromState)).put(charToAdd, toAdd);
-        String test = fromState + ", " + transitionState.toString();
-        String things = "" + transitionState.size();
-        System.out.println(test + ", " + things);
         return true;
     }
 
@@ -372,13 +368,7 @@ public class NFA implements NFAInterface {
         for (Map.Entry<NFAState, HashMap<Character, Set<NFAState>>> entry : transitionState.entrySet()) {
             if (entry.getKey() == from) {
                 HashMap<Character, Set<NFAState>> innerMap = entry.getValue();
-                String test = innerMap.toString() + ", " + from.getName();
-                System.out.println(test);
                 for (HashMap.Entry<Character, Set<NFAState>> iter : innerMap.entrySet()) {
-                    String test1 = "Checking trans: " + iter.getKey() + " == " + trans;
-                    String test2 = "Checking to: " + iter.getValue() + " contains " + to.getName();
-                    System.out.println(test1);
-                    System.out.println(test2);
                     if (iter.getKey() == trans && iter.getValue().contains(to)) {
                         return true;
                     }
