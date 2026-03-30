@@ -3,6 +3,8 @@ package fa.nfa;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -95,6 +97,47 @@ public class NFA implements NFAInterface {
         return false;
     }
 
+
+    /**
+     * Recursive helper function for accepts
+     * @param arr - character array of remaining input string
+     * @return Set<NFAState> of states the string reaches
+     */
+    private Set<NFAState> acceptsRecursive(char[] arr, NFAState curr){
+        // Edge case: array has been exhausted
+        if (arr.length <=0)
+            return null;
+
+        Set<NFAState> retval = getToState(curr, arr[0]); // No need to worry about null case, that's handled in accepts()
+        String test1 = retval.toString();
+        System.out.println(test1);
+        Set<NFAState> nextSet = null;
+
+        // Remove first character in arr
+        char[] newArr = new char[arr.length-1];
+        for (int n = 1; n < arr.length; n++){
+            newArr[n-1] = arr[n];
+        }
+        
+        // Recursively call acceptsRecursive with newArr calling each state that has been reached on the previous transition
+        Iterator<NFAState> iter = retval.iterator();
+        String size = retval.size() + "";
+        System.out.println(size);
+        while(iter.hasNext()){
+            nextSet = acceptsRecursive(newArr, iter.next());
+            if (nextSet != null){
+                String test = nextSet.toString();
+                System.out.println(test);
+            }
+        }
+
+        if (nextSet != null){
+            if (nextSet.size() > 1)
+                return nextSet;
+        }
+        return retval;
+    }
+
     /**
      * Simulates a DFA on input s to determine
      * whether the DFA accepts s.
@@ -104,6 +147,22 @@ public class NFA implements NFAInterface {
      */
     @Override
     public boolean accepts(String s) {
+        char[] trans = s.toCharArray();
+
+        // Edge case: s contains an invalid transition
+        for (char t: trans){
+            if (!sigma.contains(t))
+                return false;
+        }
+
+        // Fetch the Set of states the string 's' reaches 
+
+        Iterator<NFAState> checkIfFinal = acceptsRecursive(trans, init).iterator();
+        while(checkIfFinal.hasNext()){
+            NFAState checker = checkIfFinal.next();
+            if (isFinal(checker.getName())) 
+                return true;
+        }
         return false;
     }
 

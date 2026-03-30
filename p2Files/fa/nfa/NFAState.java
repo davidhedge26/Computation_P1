@@ -9,4 +9,11 @@ public class NFAState extends State {
     public NFAState(String name) {
         super(name);
     }
+
+    /**
+     * When given a certain transition return the state that transition leads to
+     */
+    public NFAState toStates(char given) {
+        return null;
+    }
 }
