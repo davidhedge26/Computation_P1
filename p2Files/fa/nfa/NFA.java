@@ -12,13 +12,13 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.Stack;
 
-import fa.dfa.DFAState;
+import fa.nfa.NFAState;
 
 public class NFA implements NFAInterface {
 
     /**
      * new methods from interface
-     * (toward bottom):"isDFA","maxcopies","eClosure","getToState"
+     * (toward bottom):"isNFA","maxcopies","eClosure","getToState"
      *
      * Carried over code from previous, large sticking point is transitions
      * (in state obj, or use map), but not both
@@ -44,18 +44,20 @@ public class NFA implements NFAInterface {
     private NFAState init = new NFAState(null);
     private LinkedHashSet<NFAState> finState;
     private LinkedHashMap<NFAState, HashMap<Character, Set<NFAState>>> transitionState;
+    // private int copies;
 
 
     /**
      * Constructor method for the NFA class
      */
     public NFA(){
-        sigma = new LinkedHashSet<>();
-        states = new LinkedHashSet<>();
-        init = new NFAState(null);
-        finState = new LinkedHashSet<>();
-        transitionState = new LinkedHashMap<>();
-        sigma.add('e');
+        this.sigma = new LinkedHashSet<>();
+        this.states = new LinkedHashSet<>();
+        this.init = new NFAState(null);
+        this.finState = new LinkedHashSet<>();
+        this.transitionState = new LinkedHashMap<>();
+        // this.copies = 0;
+        this.sigma.add('e');
     }
 
     /**
@@ -113,43 +115,19 @@ public class NFA implements NFAInterface {
 
 
     /**
-     * Hellper function for acceptsRecursive which handles epsilon transitions
-     * @param curr
-     * @return
-     */
-    private Set<NFAState> getEpsilonClosure(NFAState curr) {
-        Set<NFAState> closure = new HashSet<>();
-        Stack<NFAState> stack = new Stack<>();
-        stack.push(curr);
-
-        while (!stack.isEmpty()) {
-            NFAState state = stack.pop();
-            Set<NFAState> eNextStates = getToState(state, 'e');
-            if (eNextStates != null) {
-                for (NFAState eNext : eNextStates) {
-                    if (!closure.contains(eNext)) {
-                        closure.add(eNext);
-                        stack.push(eNext); // Keep following epsilon chains
-                    }
-                }
-            }
-        }
-        return closure;
-    }
-
-    /**
      * Recursive helper function for accepts
      * @param arr - character array of remaining input string
      * @return Set<NFAState> of states the string reaches
      */
-    private Set<NFAState> acceptsRecursive(char[] arr, NFAState curr) {
-        // Edge case: string exhausted — return current state plus any epsilon-reachable states
+    private Set<NFAState> acceptsRecursive(char[] arr, NFAState curr, int[] copies) {
+        // Base case: string exhausted so return current state and any epsilon-reachable states
         if (arr.length == 0) {
             Set<NFAState> result = new HashSet<>();
             result.add(curr);
 
-            // Collect all epsilon-reachable states
-            result.addAll(getEpsilonClosure(curr)); 
+            // Collect all epsilon states
+            result.addAll(eClosure(curr)); 
+            copies[0] = Math.max(copies[0], result.size());
             return result;
         }
 
@@ -165,34 +143,35 @@ public class NFA implements NFAInterface {
         Set<NFAState> nextStates = getToState(curr, arr[0]);
         if (nextStates != null) {
             for (NFAState next : nextStates) {
-                Set<NFAState> trial = acceptsRecursive(newArr, next);
+                Set<NFAState> trial = acceptsRecursive(newArr, next, copies);
                 if (trial != null)
                     result.addAll(trial); // Merge all branches into result
             }
         }
 
         // Follow epsilon transitions from curr, then consume arr[0] from those states
-        Set<NFAState> epsilonReachable = getEpsilonClosure(curr);
+        Set<NFAState> epsilonReachable = eClosure(curr);
         for (NFAState eState : epsilonReachable) {
             Set<NFAState> eNextStates = getToState(eState, arr[0]);
             if (eNextStates != null) {
                 for (NFAState next : eNextStates) {
-                    Set<NFAState> trial = acceptsRecursive(newArr, next);
+                    Set<NFAState> trial = acceptsRecursive(newArr, next, copies);
                     if (trial != null)
                         result.addAll(trial);
                 }
             }
         }
-
+        
+        copies[0] = Math.max(copies[0], result.size());
         return result.isEmpty() ? null : result;
     }
 
     /**
-     * Simulates a DFA on input s to determine
-     * whether the DFA accepts s.
+     * Simulates an NFA on input s to determine
+     * whether the NFA accepts s.
      * 
      * @param s - the input string
-     * @return true if s in the language of the DFA and false otherwise
+     * @return true if s in the language of the NFA and false otherwise
      */
     @Override
     public boolean accepts(String s) {
@@ -205,8 +184,8 @@ public class NFA implements NFAInterface {
         }
 
         // Fetch the Set of states the string 's' reaches 
-
-        Set<NFAState> results = acceptsRecursive(trans, init);
+        int[] dud = {1};
+        Set<NFAState> results = acceptsRecursive(trans, init, dud);
         if (results == null) 
             return false;
         Iterator<NFAState> checkIfFinal = results.iterator();
@@ -363,50 +342,6 @@ public class NFA implements NFAInterface {
         return true;
     }
 
-    /**
-     *  SWAP DOESN'T GET TESTED IN THE NFA TESTS. CAN WORK ON AT A FUTURE DATE
-     * Creates a deep copy of this NFA 
-     * which transitions labels are
-     * swapped between symb1 & symb2.
-     * 
-     * @return a copy of this DFA
-     */
-    // public NFA swap(char symb1, char symb2) {
-    //     // Instantiate a new NFA with given sigmas
-    //     NFA copy = new NFA();
-    //     copy.addSigma(symb1);
-    //     copy.addSigma(symb2);
-
-    //     // Set all final states to be final states in copy
-    //     Iterator<NFAState> iter = finState.iterator();
-    //     while (iter.hasNext()) {
-    //         copy.setFinal(iter.next().getName());
-    //     }
-    //     // Set start to start in copy
-    //     copy.setStart(init.getName());
-
-    //     // Iterate through all states to add swapped transitions and states if they don't exist in copy
-    //     iter = states.iterator();
-    //     while (iter.hasNext()) {
-    //         NFAState next = iter.next();
-    //         String name = next.getName();
-
-    //         // If the copy's set of states doesn't contain "next" state, add "next"
-    //         if (!copy.states.contains(getState(name))) copy.addState(name);
-
-    //         // Add reversed transitions into states
-    //         if (containsTrans(next, iter.next(), symb1)) {
-                
-    //             copy.addTransition(name, next.next(symb1), symb2);
-    //             copy.addTransition(name, next.next(symb1), symb2);
-    //         }
-    //         if (next.containsTrans(symb2)) {
-    //             copy.addTransition(name, next.next(symb2), symb1);
-    //         }
-    //     }
-
-    //     return copy;
-    // }
 
     /**
      * Construct the textual representation of the NFA, for example
@@ -512,9 +447,7 @@ public class NFA implements NFAInterface {
                         return true;
                     }
                 }
-
             }
-
         }
         return false;
     }
@@ -572,22 +505,31 @@ public class NFA implements NFAInterface {
     /**
      * Determines the maximum number of NFA copies
      * created when processing string s
+     * Similar to how accept functions
      * 
      * @param s - the input string
      * @return - the maximum number of NFA copies created.
      */
     public int maxCopies(String s) {
+        int[] copies = {1};
 
+        if (s.equals("e")) 
+            s = "";
+
+        char[] arr = s.toCharArray();
+        acceptsRecursive(arr, init, copies);
+        int retval = copies[0];
+        return retval;
     }
 
     /**
-     * Determines if NFA is an instance of a DFA
+     * Determines if NFA is an instance of a NFA
      * 
-     * @return - true if NFA's transition function has DFA's properties.
+     * @return - true if NFA's transition function has NFA's properties.
      */
     public boolean isDFA() {
-        // keywords "returns true if NFA functions contain DFA's properties."
-        // I do not believe here we have to convert NFA to DFA.
+        // keywords "returns true if NFA functions contain NFA's properties."
+        // I do not believe here we have to convert NFA to NFA.
         // Proof by contradiction used, then
 
         // Does NFA have transitions leading to multiple states?
@@ -595,12 +537,12 @@ public class NFA implements NFAInterface {
         Iterator<Character> transition = sigma.iterator();
         while (iter.hasNext()){
             NFAState next = iter.next();
-            // State contatins an epsilon transition and cannot be a DFA
+            // State contatins an epsilon transition and cannot be a NFA
             if (getToState(next, 'e').size() == 0) return false; 
 
             while (transition.hasNext()){
                 char trans = transition.next();
-                // State has multiple destinations on the same transition and cannot be a DFA
+                // State has multiple destinations on the same transition and cannot be a NFA
                 if (getToState(next, trans).size() > 1) return false;
             }
         }
