@@ -4,6 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
@@ -39,7 +40,7 @@ public class NFA implements NFAInterface {
     private LinkedHashSet<NFAState> states = new LinkedHashSet<>();
     private NFAState init = new NFAState(null);
     private LinkedHashSet<NFAState> finState = new LinkedHashSet<>();
-    private LinkedHashMap<NFAState, HashMap<Character, NFAState>> transitionState = new LinkedHashMap<>();
+    private LinkedHashMap<NFAState, HashMap<Character, Set<NFAState>>> transitionState = new LinkedHashMap<>();
 
     /**
      * Adds a a state to the NFA instance
@@ -196,24 +197,39 @@ public class NFA implements NFAInterface {
             return false;
 
         Character charToAdd = onSymb;
-        if (!transitionState.containsKey(fromState)) {
+        Set<NFAState> toAdd = new HashSet<>();
+        if (!transitionState.containsKey(getState(fromState))) {
             transitionState.put(getState(fromState), new HashMap<>());
 
-            // Add every state that exists in the set of toStates
-            Iterator<String> iter = toStates.iterator();
-            while (iter.hasNext()){
-                NFAState next = getState(iter.next());
-                if (!states.contains(next)) // Check if current toState exists as a valid state
-                    return false;
-                transitionState.get(getState(fromState)).put(charToAdd, next);
-            }
         } else {
             Iterator<String> iter = toStates.iterator();
             while (iter.hasNext()){
                 NFAState next = getState(iter.next());
-                transitionState.get(getState(fromState)).put(charToAdd, next);
+                HashMap<Character, Set<NFAState>> innerMap = transitionState.get(getState(fromState));
+
+                // If no set exists for this character yet, create one
+                if (!innerMap.containsKey(charToAdd)) {
+                    innerMap.put(charToAdd, new LinkedHashSet<>());
+                }
+
+                // Add to the set
+                innerMap.get(charToAdd).add(next);
             }
         }
+
+        // Add every state that exists in the set of toStates
+        Iterator<String> iter = toStates.iterator();
+        while (iter.hasNext()){
+            NFAState next = getState(iter.next());
+            if (!states.contains(next)) // Check if current toState exists as a valid state
+                return false;
+            toAdd.add(next);
+        }
+        
+        transitionState.get(getState(fromState)).put(charToAdd, toAdd);
+        String test = fromState + ", " + transitionState.toString();
+        String things = "" + transitionState.size();
+        System.out.println(test + ", " + things);
         return true;
     }
 
@@ -325,12 +341,12 @@ public class NFA implements NFAInterface {
         // loop through states
         // append from transition table
         for (NFAState temp : states) {
-            for (Map.Entry<NFAState, HashMap<Character, NFAState>> entry : transitionState.entrySet()) {
+            for (Map.Entry<NFAState, HashMap<Character, Set<NFAState>>> entry : transitionState.entrySet()) {
                 if (entry.getKey() == temp) {
                     sl.append(" " + temp.toString());
-                    HashMap<Character, NFAState> innerMap = entry.getValue();
+                    HashMap<Character, Set<NFAState>> innerMap = entry.getValue();
                     for (Character bet : sigma) {
-                        for (HashMap.Entry<Character, NFAState> iter : innerMap.entrySet()) {
+                        for (HashMap.Entry<Character, Set<NFAState>> iter : innerMap.entrySet()) {
                             if (iter.getKey() == bet)
                                 sl.append(" " + iter.getValue());
                         }
@@ -344,16 +360,27 @@ public class NFA implements NFAInterface {
         return sb.toString();
     }
 
-    public boolean containsTrans(NFAState from, NFAState to, char Symbol) {
+    /**
+     * Checks if a given state "from" contains a transition equal to "symbol" which leads to state "to"
+     * @param from
+     * @param to
+     * @param trans
+     * @return true if from contains transition, false if otherwise
+     */
+    public boolean containsTrans(NFAState from, NFAState to, char trans) {
         // loop outer keys
-        for (Map.Entry<NFAState, HashMap<Character, NFAState>> entry : transitionState.entrySet()) {
+        for (Map.Entry<NFAState, HashMap<Character, Set<NFAState>>> entry : transitionState.entrySet()) {
             if (entry.getKey() == from) {
-                HashMap<Character, NFAState> innerMap = entry.getValue();
-                for (HashMap.Entry<Character, NFAState> iter : innerMap.entrySet()) {
-                    if (iter.getKey() == Symbol) {
-                        if (iter.getValue() == to) {
-                            return true;
-                        }
+                HashMap<Character, Set<NFAState>> innerMap = entry.getValue();
+                String test = innerMap.toString() + ", " + from.getName();
+                System.out.println(test);
+                for (HashMap.Entry<Character, Set<NFAState>> iter : innerMap.entrySet()) {
+                    String test1 = "Checking trans: " + iter.getKey() + " == " + trans;
+                    String test2 = "Checking to: " + iter.getValue() + " contains " + to.getName();
+                    System.out.println(test1);
+                    System.out.println(test2);
+                    if (iter.getKey() == trans && iter.getValue().contains(to)) {
+                        return true;
                     }
                 }
 
@@ -398,14 +425,15 @@ public class NFA implements NFAInterface {
 
     public Set<NFAState> eClosure(NFAState s) {
         Set<NFAState> retval = new LinkedHashSet<NFAState>();
+        retval.add(s);
 
         // run through state connected by s via 'e' and add each one to retval
         // once no states are reachable end function
         Set<NFAState> reachable = getToState(s, 'e');
-        retval.addAll(reachable);
         Iterator<NFAState> iter = reachable.iterator();
-        while (iter.hasNext()){
+        for (int n = 0; n < reachable.size(); n++){
             NFAState next = iter.next();
+            retval.add(next);
             retval.addAll(eClosure(next)); // addALL ignores duplicates (or at least it should as stated in its documentation)
         }
 

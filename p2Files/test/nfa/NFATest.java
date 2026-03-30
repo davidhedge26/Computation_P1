@@ -65,6 +65,15 @@ public class NFATest {
 	}
 
 	@Test
+	public void test1_cT() {
+		NFA nfa = nfa1();
+		assertTrue(nfa.containsTrans(nfa.getState("a"), nfa.getState("a"), '0'));
+		assertTrue(nfa.containsTrans(nfa.getState("a"), nfa.getState("b"), '1'));
+		assertTrue(nfa.containsTrans(nfa.getState("b"), nfa.getState("a"), 'e'));
+		System.out.println("nfa1 eClosure done");
+	}
+
+	@Test
 	public void test1_4() {
 		NFA nfa = nfa1();
 		assertEquals(nfa.eClosure(nfa.getState("a")), Set.of(nfa.getState("a")));
