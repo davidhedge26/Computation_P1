@@ -136,7 +136,7 @@ public class NFA implements NFAInterface {
         Iterator<NFAState> iter = retval.iterator();
         String size = retval.size() + "";
         System.out.println(size);
-        while(iter.hasNext()){
+        for(int n = 0; n < retval.size(); n++){
             nextSet = acceptsRecursive(newArr, iter.next());
             if (nextSet != null){
                 String test = nextSet.toString();
@@ -145,7 +145,7 @@ public class NFA implements NFAInterface {
         }
 
         if (nextSet != null){
-            if (nextSet.size() > 1)
+            if (nextSet.size() > 0)
                 return nextSet;
         }
         return retval;
@@ -270,6 +270,22 @@ public class NFA implements NFAInterface {
 
         Character charToAdd = onSymb;
         Set<NFAState> toAdd = new HashSet<>();
+
+        // Add every state that currently exists inside of the transition state
+        // This is an ugly solution but it works 
+        // Otherwise all old states pointed at by a transition would get erased by the new state
+        HashMap<Character, Set<NFAState>> innerMap = transitionState.get(getState(fromState));
+        if (innerMap != null && innerMap.get(charToAdd) != null){
+            for (NFAState iter: innerMap.get(charToAdd)) {
+                String test = toAdd.toString();
+                System.out.println(test);
+                toAdd.add(iter);
+                test = toAdd.toString();
+                System.out.println(test);
+            }
+        }
+
+
         if (!transitionState.containsKey(getState(fromState))) {
             transitionState.put(getState(fromState), new HashMap<>());
 
@@ -277,13 +293,11 @@ public class NFA implements NFAInterface {
             Iterator<String> iter = toStates.iterator();
             while (iter.hasNext()){
                 NFAState next = getState(iter.next());
-                HashMap<Character, Set<NFAState>> innerMap = transitionState.get(getState(fromState));
 
                 // If no set exists for this character yet, create one
                 if (!innerMap.containsKey(charToAdd)) {
                     innerMap.put(charToAdd, new LinkedHashSet<>());
                 }
-
                 // Add to the set
                 innerMap.get(charToAdd).add(next);
             }
@@ -297,7 +311,13 @@ public class NFA implements NFAInterface {
                 return false;
             toAdd.add(next);
         }
+
+
+        String test = transitionState.toString();
+        System.out.println(test);
         transitionState.get(getState(fromState)).put(charToAdd, toAdd);
+        test = transitionState.toString();
+        System.out.println(test);
         return true;
     }
 
@@ -437,9 +457,13 @@ public class NFA implements NFAInterface {
      */
     public boolean containsTrans(NFAState from, NFAState to, char trans) {
         // loop outer keys
-        for (Map.Entry<NFAState, HashMap<Character, Set<NFAState>>> entry : transitionState.entrySet()) {
+        for (Map.Entry<NFAState, HashMap<Character, Set<NFAState>>> entry: transitionState.entrySet()) {
             if (entry.getKey() == from) {
                 HashMap<Character, Set<NFAState>> innerMap = entry.getValue();
+
+                String test = entry.toString();
+                System.out.println(test);
+
                 for (HashMap.Entry<Character, Set<NFAState>> iter : innerMap.entrySet()) {
                     if (iter.getKey() == trans && iter.getValue().contains(to)) {
                         return true;

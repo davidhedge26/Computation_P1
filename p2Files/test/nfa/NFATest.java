@@ -179,6 +179,14 @@ public class NFATest {
 	}
 
 	@Test
+	public void test2_cT() {
+		NFA nfa = nfa2();
+		assertTrue(nfa.containsTrans(nfa.getState("q0"), nfa.getState("q0"), '0'));
+		assertTrue(nfa.containsTrans(nfa.getState("q0"), nfa.getState("q0"), '1'));
+		assertTrue(nfa.containsTrans(nfa.getState("q0"), nfa.getState("q1"), '1'));
+	}
+
+	@Test
 	public void test2_5() {
 		NFA nfa = nfa2();
 		assertTrue(nfa.accepts("1111"));
