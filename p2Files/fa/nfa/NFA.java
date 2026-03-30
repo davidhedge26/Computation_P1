@@ -38,11 +38,24 @@ public class NFA implements NFAInterface {
      * 
      * NFA: has e-closure
      */
-    private LinkedHashSet<Character> sigma = new LinkedHashSet<>();
-    private LinkedHashSet<NFAState> states = new LinkedHashSet<>();
+    private LinkedHashSet<Character> sigma;
+    private LinkedHashSet<NFAState> states;
     private NFAState init = new NFAState(null);
-    private LinkedHashSet<NFAState> finState = new LinkedHashSet<>();
-    private LinkedHashMap<NFAState, HashMap<Character, Set<NFAState>>> transitionState = new LinkedHashMap<>();
+    private LinkedHashSet<NFAState> finState;
+    private LinkedHashMap<NFAState, HashMap<Character, Set<NFAState>>> transitionState;
+
+
+    /**
+     * Constructor method for the NFA class
+     */
+    public NFA(){
+        sigma = new LinkedHashSet<>();
+        states = new LinkedHashSet<>();
+        init = new NFAState(null);
+        finState = new LinkedHashSet<>();
+        transitionState = new LinkedHashMap<>();
+        sigma.add('e');
+    }
 
     /**
      * Adds a a state to the NFA instance
