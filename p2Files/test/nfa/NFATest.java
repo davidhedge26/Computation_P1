@@ -184,6 +184,7 @@ public class NFATest {
 		assertTrue(nfa.containsTrans(nfa.getState("q0"), nfa.getState("q0"), '0'));
 		assertTrue(nfa.containsTrans(nfa.getState("q0"), nfa.getState("q0"), '1'));
 		assertTrue(nfa.containsTrans(nfa.getState("q0"), nfa.getState("q1"), '1'));
+		assertTrue(nfa.containsTrans(nfa.getState("q4"), nfa.getState("q1"), '0'));
 	}
 
 	@Test

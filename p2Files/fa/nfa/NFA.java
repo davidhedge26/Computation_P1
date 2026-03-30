@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
+import java.util.Stack;
 
 import fa.dfa.DFAState;
 
@@ -112,43 +113,78 @@ public class NFA implements NFAInterface {
 
 
     /**
+     * Hellper function for acceptsRecursive which handles epsilon transitions
+     * @param curr
+     * @return
+     */
+    private Set<NFAState> getEpsilonClosure(NFAState curr) {
+        Set<NFAState> closure = new HashSet<>();
+        Stack<NFAState> stack = new Stack<>();
+        stack.push(curr);
+
+        while (!stack.isEmpty()) {
+            NFAState state = stack.pop();
+            Set<NFAState> eNextStates = getToState(state, 'e');
+            if (eNextStates != null) {
+                for (NFAState eNext : eNextStates) {
+                    if (!closure.contains(eNext)) {
+                        closure.add(eNext);
+                        stack.push(eNext); // Keep following epsilon chains
+                    }
+                }
+            }
+        }
+        return closure;
+    }
+
+    /**
      * Recursive helper function for accepts
      * @param arr - character array of remaining input string
      * @return Set<NFAState> of states the string reaches
      */
-    private Set<NFAState> acceptsRecursive(char[] arr, NFAState curr){
-        // Edge case: array has been exhausted
-        if (arr.length <=0)
-            return null;
+    private Set<NFAState> acceptsRecursive(char[] arr, NFAState curr) {
+        // Edge case: string exhausted — return current state plus any epsilon-reachable states
+        if (arr.length == 0) {
+            Set<NFAState> result = new HashSet<>();
+            result.add(curr);
 
-        Set<NFAState> retval = getToState(curr, arr[0]); // No need to worry about null case, that's handled in accepts()
-        String test1 = retval.toString();
-        System.out.println(test1);
-        Set<NFAState> nextSet = null;
-
-        // Remove first character in arr
-        char[] newArr = new char[arr.length-1];
-        for (int n = 1; n < arr.length; n++){
-            newArr[n-1] = arr[n];
+            // Collect all epsilon-reachable states
+            result.addAll(getEpsilonClosure(curr)); 
+            return result;
         }
-        
-        // Recursively call acceptsRecursive with newArr calling each state that has been reached on the previous transition
-        Iterator<NFAState> iter = retval.iterator();
-        String size = retval.size() + "";
-        System.out.println(size);
-        for(int n = 0; n < retval.size(); n++){
-            nextSet = acceptsRecursive(newArr, iter.next());
-            if (nextSet != null){
-                String test = nextSet.toString();
-                System.out.println(test);
+
+        Set<NFAState> result = new HashSet<>();
+
+        // Remove first character from arr
+        char[] newArr = new char[arr.length - 1];
+        for (int n = 1; n < arr.length; n++) {
+            newArr[n - 1] = arr[n];
+        }
+
+        // Follow transitions on arr[0] from curr
+        Set<NFAState> nextStates = getToState(curr, arr[0]);
+        if (nextStates != null) {
+            for (NFAState next : nextStates) {
+                Set<NFAState> trial = acceptsRecursive(newArr, next);
+                if (trial != null)
+                    result.addAll(trial); // Merge all branches into result
             }
         }
 
-        if (nextSet != null){
-            if (nextSet.size() > 0)
-                return nextSet;
+        // Follow epsilon transitions from curr, then consume arr[0] from those states
+        Set<NFAState> epsilonReachable = getEpsilonClosure(curr);
+        for (NFAState eState : epsilonReachable) {
+            Set<NFAState> eNextStates = getToState(eState, arr[0]);
+            if (eNextStates != null) {
+                for (NFAState next : eNextStates) {
+                    Set<NFAState> trial = acceptsRecursive(newArr, next);
+                    if (trial != null)
+                        result.addAll(trial);
+                }
+            }
         }
-        return retval;
+
+        return result.isEmpty() ? null : result;
     }
 
     /**
@@ -170,8 +206,14 @@ public class NFA implements NFAInterface {
 
         // Fetch the Set of states the string 's' reaches 
 
-        Iterator<NFAState> checkIfFinal = acceptsRecursive(trans, init).iterator();
+        Set<NFAState> results = acceptsRecursive(trans, init);
+        if (results == null) 
+            return false;
+        Iterator<NFAState> checkIfFinal = results.iterator();
+        String test = results.toString();
+        System.out.println(test);
         while(checkIfFinal.hasNext()){
+            // Check all possible states reached by the string. If one is valid the string is valid
             NFAState checker = checkIfFinal.next();
             if (isFinal(checker.getName())) 
                 return true;
@@ -414,6 +456,10 @@ public class NFA implements NFAInterface {
         return sb.toString();
     }
 
+    /**
+     * 
+     * @return deltaString
+     */
     public String deltaString() {
         // sb will be our alphabet title
         // sl will be the state transition printout
@@ -461,9 +507,6 @@ public class NFA implements NFAInterface {
             if (entry.getKey() == from) {
                 HashMap<Character, Set<NFAState>> innerMap = entry.getValue();
 
-                String test = entry.toString();
-                System.out.println(test);
-
                 for (HashMap.Entry<Character, Set<NFAState>> iter : innerMap.entrySet()) {
                     if (iter.getKey() == trans && iter.getValue().contains(to)) {
                         return true;
@@ -477,7 +520,7 @@ public class NFA implements NFAInterface {
     }
 
     /**
-     * Return delta entries
+     * Return delta entries of states that are reachable from the "from" state by using "onSymb" transition
      * 
      * @param from   - the source state
      * @param onSymb - the label of the transition
