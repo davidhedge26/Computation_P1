@@ -11,9 +11,14 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.Stack;
+import java.lang.Math;
 
 import fa.nfa.NFAState;
 
+/**
+ * 
+ * @author David Hedge
+ */
 public class NFA implements NFAInterface {
 
     /**
@@ -120,51 +125,57 @@ public class NFA implements NFAInterface {
      * @return Set<NFAState> of states the string reaches
      */
     private Set<NFAState> acceptsRecursive(char[] arr, NFAState curr, int[] copies) {
-        // Base case: string exhausted so return current state and any epsilon-reachable states
-        if (arr.length == 0) {
-            Set<NFAState> result = new HashSet<>();
-            result.add(curr);
+        // Get full set of states reachable from curr via epsilon
+        Set<NFAState> currClosure = new HashSet<>();
+        currClosure.add(curr);
+        currClosure.addAll(eClosure(curr));
 
-            // Collect all epsilon states
-            result.addAll(eClosure(curr)); 
-            copies[0] = Math.max(copies[0], result.size());
-            return result;
+        // Max copies calculated
+        copies[0] = Math.max(copies[0], currClosure.size());
+
+        // Base case: String has been run through and is now empty
+        if (arr.length == 0) {
+            // Max copies calculated (again)
+            copies[0] = Math.max(copies[0], currClosure.size());
+            return currClosure;
         }
 
-        Set<NFAState> result = new HashSet<>();
-
-        // Remove first character from arr
+        // Go to the next in the given String
         char[] newArr = new char[arr.length - 1];
         for (int n = 1; n < arr.length; n++) {
             newArr[n - 1] = arr[n];
         }
 
-        // Follow transitions on arr[0] from curr
-        Set<NFAState> nextStates = getToState(curr, arr[0]);
-        if (nextStates != null) {
-            for (NFAState next : nextStates) {
-                Set<NFAState> trial = acceptsRecursive(newArr, next, copies);
-                if (trial != null)
-                    result.addAll(trial); // Merge all branches into result
+        // From every state in the closure, follow transitions on arr[0]
+        Set<NFAState> nextStates = new HashSet<>();
+        for (NFAState state: currClosure) {
+            Set<NFAState> transitions = getToState(state, arr[0]);
+            if (transitions != null) {
+                nextStates.addAll(transitions);
             }
         }
 
-        // Follow epsilon transitions from curr, then consume arr[0] from those states
-        Set<NFAState> epsilonReachable = eClosure(curr);
-        for (NFAState eState : epsilonReachable) {
-            Set<NFAState> eNextStates = getToState(eState, arr[0]);
-            if (eNextStates != null) {
-                for (NFAState next : eNextStates) {
-                    Set<NFAState> trial = acceptsRecursive(newArr, next, copies);
-                    if (trial != null)
-                        result.addAll(trial);
-                }
+        Set<NFAState> allNextStates = new HashSet<>();
+        for (NFAState next : nextStates) {
+            allNextStates.add(next);
+            allNextStates.addAll(eClosure(next));
+        }
+
+        // Calculate max copies again after checking nextStates
+        copies[0] = Math.max(copies[0], allNextStates.size());
+
+        // Recursive call for acceptsRecursive to get every branch possible
+        Set<NFAState> result = new HashSet<>();
+        for (NFAState next: nextStates) {
+            Set<NFAState> trial = acceptsRecursive(newArr, next, copies);
+            if (trial != null) {
+                result.addAll(trial);
             }
         }
-        
-        copies[0] = Math.max(copies[0], result.size());
+
         return result.isEmpty() ? null : result;
     }
+
 
     /**
      * Simulates an NFA on input s to determine
@@ -207,9 +218,9 @@ public class NFA implements NFAInterface {
      */
     @Override
     public void addSigma(char symbol) {
-        if (!sigma.contains('e')){
-            sigma.add('e');
-        }
+        // if (!sigma.contains('e')){
+        //     sigma.add('e');
+        // }
         if (symbol == 'e'){
             // do nothing, e is reserved for epsilon transitions
         } else{
@@ -511,7 +522,8 @@ public class NFA implements NFAInterface {
      * @return - the maximum number of NFA copies created.
      */
     public int maxCopies(String s) {
-        int[] copies = {1};
+        Set<NFAState> intialStates = eClosure(init);
+        int[] copies = {intialStates.size()};
 
         if (s.equals("e")) 
             s = "";
