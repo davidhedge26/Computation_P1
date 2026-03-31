@@ -19,8 +19,9 @@ e.g.
 * README - this file
 
 ## COMPILING AND RUNNING:
-Compile by running the below command in directories "fa" and "fa/nfa"
-* javac *.java
+Compile by running the below command in directory "p2files"
+ - javac fa/nfa/*.Java
+ 
 Then nfa can be run through NFATest.java directly.
 Otherwise NFA is a support program run in conjunction with another program.
 
