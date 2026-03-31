@@ -16,8 +16,11 @@ import java.lang.Math;
 import fa.nfa.NFAState;
 
 /**
+ * NFA.java creates and handles all the functions necessary for modeling an NFA.
+ * By inputing states, transitions, and which states on what transitions lead to which 
+ * states traversing the modeled NFA is easy.
  * 
- * @author David Hedge
+ * @author David Hedge, Jared Guidry
  */
 public class NFA implements NFAInterface {
 
