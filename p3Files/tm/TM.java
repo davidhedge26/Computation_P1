@@ -1,22 +1,59 @@
 package p3Files.tm;
 
+import java.io.File;
 import java.util.LinkedList;
 
 /**
  * @author David Hedge, Jared Guidry
  */
 public class TM {
-    private LinkedList machine;
     private TMState head;
     private TMState tail;
+    private File file;
+    private char[] machine;
 
     /**
      * Constructor for Turing Machine class
      */
     public TM() {
-        machine = new LinkedList<>();
         head = new TMState();
         tail = new TMState();
+    }
+
+    /**
+     * Constructor for Turing Machine class that is given a file to use
+     */
+    public TM(File given) {
+        file = given;
+        head = new TMState();
+        tail = new TMState();
+        parse(given);
+    }
+
+    /**
+     * parses the inputed file and builds the Turing Machine off of that
+     * @param file
+     * @return true if run correctly, false if not
+     */
+    public boolean parse(File file) {
+        // make a number of states equal to the required amount given by the file
+        for (){
+
+        }
+
+        // make a number of transitions equal to the amount required by the given file
+        for (){
+
+        }
+
+        // add transitions to every state from every state on every transition
+        // this is communicated by the given file in 1,1,R format
+        // start at state 0 on trans 0 to state n on trans m
+        for () {
+            for () {
+
+            }
+        }
     }
 
     /**
