@@ -2,6 +2,7 @@ package p3Files.tm;
 
 import java.io.File;
 import java.util.LinkedList;
+import java.util.Scanner;
 
 /**
  * @author David Hedge, Jared Guidry
@@ -11,6 +12,7 @@ public class TM {
     private TMState tail;
     private File file;
     private char[] machine;
+    private char[][][] transitions;
 
     /**
      * Constructor for Turing Machine class
@@ -36,9 +38,12 @@ public class TM {
      * @return true if run correctly, false if not
      */
     public boolean parse(File file) {
+        Scanner scn = new Scanner(file);
+        int lines = Integer.parseInt(scn.nextLine());
+        machine = new char[lines+1];
         // make a number of states equal to the required amount given by the file
-        for (){
-
+        for (int n = 0; n < lines; n++){
+            machine[n] = new Character(n);
         }
 
         // make a number of transitions equal to the amount required by the given file
@@ -74,10 +79,12 @@ public class TM {
      * Write a symbol into the cell. 
      * Function exists for checking if a string works in maneuvering through the Turing Machine
      * @param toWrite
+     * @param pos
      * @return true if function worked properly, false if not
      */
-    public boolean writeSymbol(char toWrite) {
-        
+    public boolean writeSymbol(char toWrite, int pos) {
+        if (pos < 0 || pos-1 > machine.length) return false;
+        machine[pos] = toWrite;
         return true;
     }
 
