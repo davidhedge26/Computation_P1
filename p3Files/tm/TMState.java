@@ -1,4 +1,4 @@
-package p3Files.tm;
+package tm;
 
 public class TMState {
     

@@ -1,8 +1,9 @@
-package p3Files.tm;
+package tm;
 
 import java.io.File;
 import java.util.LinkedList;
 import java.util.Scanner;
+import fa.dfa.*;
 
 /**
  * @author David Hedge, Jared Guidry
@@ -11,52 +12,60 @@ public class TM {
     private TMState head;
     private TMState tail;
     private File file;
-    private char[] machine;
-    private char[][][] transitions;
+    private char[] tape;
+    private char[] transitions;
+    private DFA dfa;
 
     /**
      * Constructor for Turing Machine class
      */
     public TM() {
+        dfa = new DFA();
         head = new TMState();
         tail = new TMState();
+        tape = new char[100];
     }
 
     /**
      * Constructor for Turing Machine class that is given a file to use
      */
     public TM(File given) {
+        dfa = new DFA();
         file = given;
         head = new TMState();
         tail = new TMState();
+        tape = new char[100];
         parse(given);
     }
 
     /**
      * parses the inputed file and builds the Turing Machine off of that
+     * builds the necessary elements of a DFA
      * @param file
      * @return true if run correctly, false if not
      */
     public boolean parse(File file) {
         Scanner scn = new Scanner(file);
         int lines = Integer.parseInt(scn.nextLine());
-        machine = new char[lines+1];
         // make a number of states equal to the required amount given by the file
         for (int n = 0; n < lines; n++){
-            machine[n] = new Character(n);
+            dfa.addState(n + "");
         }
 
-        // make a number of transitions equal to the amount required by the given file
-        for (){
 
+        // make a number of transitions equal to the amount required by the given file
+        int numTrans = Integer.parseInt(scn.nextLine()) + 1; // add 1 for the 0th transition
+        for (int n = 0; n < numTrans; n++){
+            dfa.addSigma((char)n);
         }
 
         // add transitions to every state from every state on every transition
         // this is communicated by the given file in 1,1,R format
         // start at state 0 on trans 0 to state n on trans m
-        for () {
-            for () {
-
+        for (int n = 0; scn.hasNextLine(); n++) {
+            String curr = scn.nextLine();
+            for (int i = 0; i < numTrans; i++){
+                dfa.addTransition(n + "", i + "", curr.charAt(0));
             }
         }
     }
@@ -77,30 +86,30 @@ public class TM {
 
     /**
      * Write a symbol into the cell. 
-     * Function exists for checking if a string works in maneuvering through the Turing Machine
+     * Function exists for checking if a string works in maneuvering through the Turing tape
      * @param toWrite
      * @param pos
      * @return true if function worked properly, false if not
      */
     public boolean writeSymbol(char toWrite, int pos) {
-        if (pos < 0 || pos-1 > machine.length) return false;
-        machine[pos] = toWrite;
+        if (pos < 0 || pos-1 > tape.length) return false;
+        tape[pos] = toWrite;
         return true;
     }
 
-    /**
-     * Moves the iterator to the next state in the machine according to a given L or R instruction
-     * @param trans
-     * @return true if successfully moved, false if nextState is null or instruction is bad
-     */
-    public boolean move(char trans) {
-        if (trans != 'R' && trans != 'L'){
-            return false;
-        } else if (nextState(trans) == null){
-            return false;
-        }
-        return true;
-    }
+    // /**
+    //  * Moves the iterator to the next state in the tape according to a given L or R instruction
+    //  * @param trans
+    //  * @return true if successfully moved, false if nextState is null or instruction is bad
+    //  */
+    // public boolean move(char trans) {
+    //     if (trans != 'R' && trans != 'L'){
+    //         return false;
+    //     } else if (nextState(trans) == null){
+    //         return false;
+    //     }
+    //     return true;
+    // }
 
     /**
      * parses a string to see if it successfully reaches the end of a turing machine
