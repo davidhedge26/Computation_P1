@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.Scanner;
 
 /**
+ * Makes and manages a Turing Machine given the user inputed path to a .txt file containing the blueprint
+ * 
  * @author David Hedge, Jared Guidry
  */
 public class TM {
@@ -55,8 +57,10 @@ public class TM {
             // each transition [from_state],[on_symbol],[toState,Write,move(0 or 1)]
             this.transitions = new char[states][symbol + 1][3];
 
+            // 'i' is the current state
             for (int i = 0; i < states; i++) {
 
+                // 'j' is the current transition
                 for (int j = 0; j <= symbol; j++) {
                     if (scn.hasNextLine()) {
 
@@ -70,11 +74,6 @@ public class TM {
                         this.transitions[i][j][2] = parts[2].charAt(0);
 
                     }
-                    System.out.print("From State: " + i + " ");
-                    System.out.print("On Symbol: " + j + " ");
-                    System.out.print("To state: " + (int) transitions[i][j][0] + " ");
-                    System.out.print("Write Symbol: " + (int) transitions[i][j][1] + " ");
-                    System.out.println("Move: " + transitions[i][j][2] + "\n");
 
                     // finalState will always be the state last created while parsing. It's fine to overwrite the final state because of this.
                     finalState = i;
@@ -100,7 +99,9 @@ public class TM {
         int toState = 0;
         int toWrite = 0;
         char move = 'R';
+
         int maxNeg = 0;
+        int maxNorm = 0;
 
         // Start at state 0 and transition on symbol 0 (tape is empty, this is the only available transition)
         while (curr != finalState){
@@ -112,21 +113,25 @@ public class TM {
             curr = toState;
 
             // write symbol on current slot the head points at
-            if (head < 0) {
-                negTape[head * -1] = toWrite;
-            } else {
-                tape[head] = toWrite;
-            }
+            if (head < 0) negTape[head * -1] = toWrite;
+            
+            else tape[head] = toWrite;
+            
 
             // move head accordingly
             if (Character.toUpperCase(move) == 'R'){
                 if (head > (tape.length - 2)) tape = extend(tape);
+                if (head > maxNorm){
+                    maxNorm = head;
+                }
+                
                 head++;
             } else { // move is L
                 if ((head * -1) > (negTape.length - 2)) negTape = extend(negTape);
                 if (head * -1 > maxNeg){
                     maxNeg = head * -1;
                 }
+                
                 head--;
             }
 
@@ -141,7 +146,7 @@ public class TM {
                 retval += negTape[n] + "";
             }
         }
-        for (int n = 0; n < tape.length - 1; n++){
+        for (int n = 0; n < maxNorm+2; n++){
             retval += tape[n] + "";
         }
         return retval;
@@ -151,6 +156,9 @@ public class TM {
     /**
      * extend is a helper class purely for the tape array
      * Makes the tape longer for when it reaches its limits
+     * 
+     * @param given is the array to extend
+     * @return the extended and copied array
      */
     private int[] extend(int[] given) {
         int[] newTape = new int[given.length * 2];
@@ -160,22 +168,4 @@ public class TM {
         return newTape;
         // Java has automatic garbage collection
     }
-
-    public static void main(String[] args) {
-        TM machine = new TM(args[0]);
-        String result = machine.run();
-
-
-        // Create and build the final output to be sent to stdout
-        int sumOfSymbols = 0;
-        int outputLength = 0;
-        while (outputLength < result.length()){
-            sumOfSymbols += result.charAt(outputLength) - '0';
-            outputLength++;
-        }
-        System.out.println("Resulting tape = " + result);
-        System.out.println("Sum of Symbols = " + sumOfSymbols);
-        System.out.println("Output Length = " + outputLength);
-    }
-
 }
