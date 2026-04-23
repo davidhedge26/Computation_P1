@@ -11,18 +11,26 @@ import java.util.Scanner;
 public class TM {
 
     private char[][][] transitions;
+    private int[] tape; // an infinite array so there should be no limits on it. Shouldn't make it unnecessarily big either...
+    private int[] negTape; // works by starting at -1 and downwards. No value should be stored at 0
+    private int finalState;
 
     /**
      * Constructor for Turing Machine class
      */
     public TM() {
-
+        tape = new int[50];
+        negTape = new int[50];
+        finalState = '0';
     }
 
     /**
      * Constructor for Turing Machine class that is given a file to use
      */
     public TM(String given) {
+        tape = new int[50];
+        negTape = new int[50];
+        finalState = '0';
         try {
             parse(given);
 
@@ -34,10 +42,8 @@ public class TM {
 
     /**
      * parses the inputed file and builds the Turing Machine off of that
-     * builds the necessary elements of a DFA
      * 
      * @param file
-     * @return true if run correctly, false if not
      */
     public void parse(String path) throws FileNotFoundException {
 
@@ -69,20 +75,82 @@ public class TM {
                     System.out.print("To state: " + (int) transitions[i][j][0] + " ");
                     System.out.print("Write Symbol: " + (int) transitions[i][j][1] + " ");
                     System.out.println("Move: " + transitions[i][j][2] + "\n");
+
+                    // finalState will always be the state last created while parsing. It's fine to overwrite the final state because of this.
+                    finalState = i;
                 }
             }
+            scn.close();
         } catch (Exception e) {
             System.err.println(e);
         }
 
     }
 
+
     /**
-     * Returns the state the given transition will lead to
+     * Runs the turing machine through the tape and outputs the result of that turing machine
      * 
-     * @param trans
-     * @return TMState a transition will lead to, null if nothing
+     * @return String result of the turing machine
      */
+    public String run() {
+        int head = 0;
+        int curr = 0;
+        int trans = 0;
+        int toState = 0;
+        int toWrite = 0;
+        char move = 'R';
+        boolean done = false;
+        int maxNeg = 0;
+
+        // Start at state 0 and transition on symbol 0 (tape is empty, this is the only available transition)
+        while (curr != finalState){
+            toState = (int) transitions[curr][trans][0];
+            toWrite = (int) transitions[curr][trans][1];
+            move = transitions[curr][trans][2];
+
+            // move to next state in the machine
+            curr = toState;
+            // write symbol on current slot the head points at
+            if (head < 0) {
+                negTape[head * -1] = toWrite;
+            } else {
+                tape[head] = toWrite;
+            }
+
+            // move head accordingly
+            if (Character.toUpperCase(move) == 'R'){
+                if (head > (tape.length - 2)) tape = extend(tape);
+                head++;
+            } else { // move is L
+                if ((head * -1) > (negTape.length - 2)) negTape = extend(negTape);
+                head--; maxNeg++;
+            }
+
+            trans = (head < 0) ? negTape[head * -1] : tape[head];
+            String nothing = "";
+        }
+
+        // Build the string to return
+        String retval = "";
+        if (negTape.length > 0){
+            for (int n = maxNeg - 1; n > 0; n--){
+                retval += negTape[n] + "";
+            }
+        }
+        for (int n = 0; n < tape.length - 1; n++){
+            retval += tape[n] + "";
+        }
+        return retval;
+    }
+
+
+    // /**
+    //  * Returns the state the given transition will lead to
+    //  * 
+    //  * @param trans
+    //  * @return TMState a transition will lead to, null if nothing
+    //  */
     // public TMState nextState(char trans) {
     // if (trans != 'R' && trans != 'L') {
     // return null;
@@ -92,15 +160,15 @@ public class TM {
     // return retval;
     // }
 
-    /**
-     * Write a symbol into the cell.
-     * Function exists for checking if a string works in maneuvering through the
-     * Turing tape
-     * 
-     * @param toWrite
-     * @param pos
-     * @return true if function worked properly, false if not
-     */
+    // /**
+    //  * Write a symbol into the cell.
+    //  * Function exists for checking if a string works in maneuvering through the
+    //  * Turing tape
+    //  * 
+    //  * @param toWrite
+    //  * @param pos
+    //  * @return true if function worked properly, false if not
+    //  */
     // public boolean writeSymbol(char toWrite, int pos) {
     // if (pos < 0 || pos - 1 > tape.length)
     // return false;
@@ -124,31 +192,46 @@ public class TM {
     // return true;
     // }
 
-    /**
-     * parses a string to see if it successfully reaches the end of a turing machine
-     * 
-     * @return true if successful, false if end of string reached with no end state
-     *         reached
-     */
+    // /**
+    //  * parses a string to see if it successfully reaches the end of a turing machine
+    //  * 
+    //  * @return true if successful, false if end of string reached with no end state
+    //  *         reached
+    //  */
     // public boolean accepts() {
     // return false;
     // }
 
-    /**
-     * toString function for TM
-     * 
-     * @return a String representation of the information held inside the Turing
-     *         Machine
-     */
+    // /**
+    //  * toString function for TM
+    //  * 
+    //  * @return a String representation of the information held inside the Turing
+    //  *         Machine
+    //  */
     // @Override
     // public String toString() {
     // String retString = "";
     // return retString;
     // }
 
-    public static void main(String[] args) {
-        TM machine = new TM(args[0]);
+    /**
+     * extend is a helper class purely for the tape array
+     * Makes the tape longer for when it reaches its limits
+     */
+    private int[] extend(int[] given) {
+        int[] newTape = new int[given.length * 2];
+        for (int n = 0; n < given.length; n++){
+            newTape[n] = given[n];
+        }
+        return newTape;
+        // Java has automatic garbage collection
+    }
 
+    public static void main(String[] args) {
+        // TM machine = new TM(args[0]);
+        TM machine = new TM("paths/file0.txt");
+        String result = machine.run();
+        System.out.println(result);
     }
 
 }
