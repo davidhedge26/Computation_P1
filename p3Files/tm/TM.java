@@ -100,7 +100,6 @@ public class TM {
         int toState = 0;
         int toWrite = 0;
         char move = 'R';
-        boolean done = false;
         int maxNeg = 0;
 
         // Start at state 0 and transition on symbol 0 (tape is empty, this is the only available transition)
@@ -108,7 +107,6 @@ public class TM {
             toState = (int) transitions[curr][trans][0];
             toWrite = (int) transitions[curr][trans][1];
             move = transitions[curr][trans][2];
-
             // move to next state in the machine
             curr = toState;
             // write symbol on current slot the head points at
@@ -124,17 +122,20 @@ public class TM {
                 head++;
             } else { // move is L
                 if ((head * -1) > (negTape.length - 2)) negTape = extend(negTape);
-                head--; maxNeg++;
+                int length = negTape.length;
+                if (head * -1 > maxNeg){
+                    maxNeg = head * -1;
+                }
+                head--;
             }
 
             trans = (head < 0) ? negTape[head * -1] : tape[head];
-            String nothing = "";
         }
 
         // Build the string to return
         String retval = "";
         if (negTape.length > 0){
-            for (int n = maxNeg - 1; n > 0; n--){
+            for (int n = maxNeg+1; n > 0; n--){
                 retval += negTape[n] + "";
             }
         }
@@ -229,7 +230,7 @@ public class TM {
 
     public static void main(String[] args) {
         // TM machine = new TM(args[0]);
-        TM machine = new TM("paths/file0.txt");
+        TM machine = new TM("paths/file5.txt");
         String result = machine.run();
         System.out.println(result);
     }
