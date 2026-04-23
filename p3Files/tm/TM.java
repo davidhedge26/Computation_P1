@@ -107,8 +107,10 @@ public class TM {
             toState = (int) transitions[curr][trans][0];
             toWrite = (int) transitions[curr][trans][1];
             move = transitions[curr][trans][2];
+
             // move to next state in the machine
             curr = toState;
+
             // write symbol on current slot the head points at
             if (head < 0) {
                 negTape[head * -1] = toWrite;
@@ -122,13 +124,13 @@ public class TM {
                 head++;
             } else { // move is L
                 if ((head * -1) > (negTape.length - 2)) negTape = extend(negTape);
-                int length = negTape.length;
                 if (head * -1 > maxNeg){
                     maxNeg = head * -1;
                 }
                 head--;
             }
 
+            // Make transition the symbol currently held at the slot the head looks at
             trans = (head < 0) ? negTape[head * -1] : tape[head];
         }
 
@@ -146,75 +148,6 @@ public class TM {
     }
 
 
-    // /**
-    //  * Returns the state the given transition will lead to
-    //  * 
-    //  * @param trans
-    //  * @return TMState a transition will lead to, null if nothing
-    //  */
-    // public TMState nextState(char trans) {
-    // if (trans != 'R' && trans != 'L') {
-    // return null;
-    // }
-
-    // TMState retval = null;
-    // return retval;
-    // }
-
-    // /**
-    //  * Write a symbol into the cell.
-    //  * Function exists for checking if a string works in maneuvering through the
-    //  * Turing tape
-    //  * 
-    //  * @param toWrite
-    //  * @param pos
-    //  * @return true if function worked properly, false if not
-    //  */
-    // public boolean writeSymbol(char toWrite, int pos) {
-    // if (pos < 0 || pos - 1 > tape.length)
-    // return false;
-    // tape[pos] = toWrite;
-    // return true;
-    // }
-
-    // /**
-    // * Moves the iterator to the next state in the tape according to a given L or
-    // R instruction
-    // * @param trans
-    // * @return true if successfully moved, false if nextState is null or
-    // instruction is bad
-    // */
-    // public boolean move(char trans) {
-    // if (trans != 'R' && trans != 'L'){
-    // return false;
-    // } else if (nextState(trans) == null){
-    // return false;
-    // }
-    // return true;
-    // }
-
-    // /**
-    //  * parses a string to see if it successfully reaches the end of a turing machine
-    //  * 
-    //  * @return true if successful, false if end of string reached with no end state
-    //  *         reached
-    //  */
-    // public boolean accepts() {
-    // return false;
-    // }
-
-    // /**
-    //  * toString function for TM
-    //  * 
-    //  * @return a String representation of the information held inside the Turing
-    //  *         Machine
-    //  */
-    // @Override
-    // public String toString() {
-    // String retString = "";
-    // return retString;
-    // }
-
     /**
      * extend is a helper class purely for the tape array
      * Makes the tape longer for when it reaches its limits
@@ -229,10 +162,20 @@ public class TM {
     }
 
     public static void main(String[] args) {
-        // TM machine = new TM(args[0]);
-        TM machine = new TM("paths/file5.txt");
+        TM machine = new TM(args[0]);
         String result = machine.run();
-        System.out.println(result);
+
+
+        // Create and build the final output to be sent to stdout
+        int sumOfSymbols = 0;
+        int outputLength = 0;
+        while (outputLength < result.length()){
+            sumOfSymbols += result.charAt(outputLength) - '0';
+            outputLength++;
+        }
+        System.out.println("Resulting tape = " + result);
+        System.out.println("Sum of Symbols = " + sumOfSymbols);
+        System.out.println("Output Length = " + outputLength);
     }
 
 }
