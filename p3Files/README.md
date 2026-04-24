@@ -28,9 +28,9 @@ Console output will give the results after the program finishes.
 
 PROGRAM DESIGN AND IMPORTANT CONCEPTS:
 
+The TM class is split into various method calls that handle parsing, running, and extending. The parse mathod builds the three dimensional transition array from the file rules, and retrieves the amount of states and transition symbols required. The 3-dimensional array approach, was due to it essentially being simple values that were being read or written, and was much quicker to run than a nested map, and all the associated overhead. The parse utilizes a nested for loop to accomplish the majority of the building from file. The run method relies on a while loop to move through the necessary transitions and the multi-tape setup. The multi-tape approach is so that negative indices can be translated to an additional tape.
 
-
-The TM class is split into various method calls that handle parsing, running, and extending. The parse mathod builds the three dimensional transition array from the file rules, and retrieves the amount of states and transition symbols required. The 3-dimensional array approach, was due to it essentially being simple values that were being read or written, and was much quicker to run than a nested map, and all the associated overhead. The parse utilizes a nested for loop to accomplish the majority of the building from file. The run method relies on a while loop to move through the necessary transitions and the multi-tape setup. The multi-tape approach is so that negative indices can be translated to an additional tape.  
+We went for speed in the design of this project, and made the decision that the entire nested map structure in other iterations of the project would slow us down completely, and so we went with the 3 dimensional array. Once we had drawn out the tape and the rules from some of the example tests, we realized it would be necessary to have some sort of fall back for values on the negative side of the tape. We hoped to accomplish some sort of object oriented approach by make the TM seperate from the simulator, by utilizing it, as its own object.
 
 
 This is the sort of information someone who really wants to
