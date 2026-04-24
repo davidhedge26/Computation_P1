@@ -6,14 +6,16 @@ import java.util.LinkedList;
 import java.util.Scanner;
 
 /**
- * Makes and manages a Turing Machine given the user inputed path to a .txt file containing the blueprint
+ * Makes and manages a Turing Machine given the user inputed path to a .txt file
+ * containing the blueprint
  * 
  * @author David Hedge, Jared Guidry
  */
 public class TM {
 
     private char[][][] transitions;
-    private int[] tape; // an infinite array so there should be no limits on it. Shouldn't make it unnecessarily big either...
+    private int[] tape; // an infinite array so there should be no limits on it. Shouldn't make it
+                        // unnecessarily big either...
     private int[] negTape; // works by starting at -1 and downwards. No value should be stored at 0
     private int finalState;
 
@@ -75,7 +77,8 @@ public class TM {
 
                     }
 
-                    // finalState will always be the state last created while parsing. It's fine to overwrite the final state because of this.
+                    // finalState will always be the state last created while parsing. It's fine to
+                    // overwrite the final state because of this.
                     finalState = i;
                 }
             }
@@ -86,9 +89,9 @@ public class TM {
 
     }
 
-
     /**
-     * Runs the turing machine through the tape and outputs the result of that turing machine
+     * Runs the turing machine through the tape and outputs the result of that
+     * turing machine
      * 
      * @return String result of the turing machine
      */
@@ -103,8 +106,9 @@ public class TM {
         int maxNeg = 0;
         int maxNorm = 0;
 
-        // Start at state 0 and transition on symbol 0 (tape is empty, this is the only available transition)
-        while (curr != finalState){
+        // Start at state 0 and transition on symbol 0 (tape is empty, this is the only
+        // available transition)
+        while (curr != finalState) {
             toState = (int) transitions[curr][trans][0];
             toWrite = (int) transitions[curr][trans][1];
             move = transitions[curr][trans][2];
@@ -113,25 +117,28 @@ public class TM {
             curr = toState;
 
             // write symbol on current slot the head points at
-            if (head < 0) negTape[head * -1] = toWrite;
-            
-            else tape[head] = toWrite;
-            
+            if (head < 0)
+                negTape[head * -1] = toWrite;
+
+            else
+                tape[head] = toWrite;
 
             // move head accordingly
-            if (Character.toUpperCase(move) == 'R'){
-                if (head > (tape.length - 2)) tape = extend(tape);
-                if (head > maxNorm){
+            if (Character.toUpperCase(move) == 'R') {
+                if (head > (tape.length - 2))
+                    tape = extend(tape);
+                if (head > maxNorm) {
                     maxNorm = head;
                 }
-                
+
                 head++;
             } else { // move is L
-                if ((head * -1) > (negTape.length - 2)) negTape = extend(negTape);
-                if (head * -1 > maxNeg){
+                if ((head * -1) > (negTape.length - 2))
+                    negTape = extend(negTape);
+                if (head * -1 > maxNeg) {
                     maxNeg = head * -1;
                 }
-                
+
                 head--;
             }
 
@@ -141,17 +148,16 @@ public class TM {
 
         // Build the string to return
         String retval = "";
-        if (negTape.length > 0){
-            for (int n = maxNeg+1; n > 0; n--){
+        if (negTape.length > 0) {
+            for (int n = maxNeg + 1; n > 0; n--) {
                 retval += negTape[n] + "";
             }
         }
-        for (int n = 0; n < maxNorm+2; n++){
+        for (int n = 0; n < maxNorm + 2; n++) {
             retval += tape[n] + "";
         }
         return retval;
     }
-
 
     /**
      * extend is a helper class purely for the tape array
@@ -162,7 +168,7 @@ public class TM {
      */
     private int[] extend(int[] given) {
         int[] newTape = new int[given.length * 2];
-        for (int n = 0; n < given.length; n++){
+        for (int n = 0; n < given.length; n++) {
             newTape[n] = given[n];
         }
         return newTape;
