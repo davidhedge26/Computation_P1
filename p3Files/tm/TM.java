@@ -18,6 +18,8 @@ public class TM {
                         // unnecessarily big either...
     private int[] negTape; // works by starting at -1 and downwards. No value should be stored at 0
     private int finalState;
+    private int outputSum;
+    private int outputLength;
 
     /**
      * Constructor for Turing Machine class
@@ -25,7 +27,9 @@ public class TM {
     public TM() {
         tape = new int[50];
         negTape = new int[50];
-        finalState = '0';
+        finalState = 0;
+        outputSum = 0;
+        outputLength = 0;
     }
 
     /**
@@ -34,7 +38,9 @@ public class TM {
     public TM(String given) {
         tape = new int[50];
         negTape = new int[50];
-        finalState = '0';
+        finalState = 0;
+        outputSum = 0;
+        outputLength = 0;
         try {
             parse(given);
 
@@ -150,12 +156,15 @@ public class TM {
         String retval = "";
         if (negTape.length > 0) {
             for (int n = maxNeg + 1; n > 0; n--) {
+                outputSum += negTape[n];
                 retval += negTape[n] + "";
             }
         }
         for (int n = 0; n < maxNorm + 2; n++) {
+            outputSum += tape[n];
             retval += tape[n] + "";
         }
+        outputLength = retval.length();
         return retval;
     }
 
@@ -173,5 +182,21 @@ public class TM {
         }
         return newTape;
         // Java has automatic garbage collection
+    }
+
+    /**
+     * Returns the sum of all the integers in the tape
+     * @return the sum of all the integers in the tape
+     */
+    public int getOutputSum() {
+        return outputSum;
+    }
+
+    /**
+     * Returns the length of the tape
+     * @return the length of the tape
+     */
+    public int getOutputLength() {
+        return outputLength;
     }
 }

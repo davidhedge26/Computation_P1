@@ -19,14 +19,8 @@ public class TMSimulator {
 
 
         // Create and build the final output to be sent to stdout
-        int sumOfSymbols = 0;
-        int outputLength = 0;
-        while (outputLength < result.length()){
-            sumOfSymbols += result.charAt(outputLength) - '0';
-            outputLength++;
-        }
         System.out.println("Resulting tape = " + result);
-        System.out.println("Output Length = " + outputLength);
-        System.out.println("Sum of Symbols = " + sumOfSymbols);
+        System.out.println("Output Length = " + machine.getOutputLength());
+        System.out.println("Sum of Symbols = " + machine.getOutputSum());
     }
 }

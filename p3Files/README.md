@@ -20,77 +20,44 @@ e.g.
 COMPILING AND RUNNING:
 From the directory containing all source files, compile the
 driver class (and all dependencies) with the command:
-make all(if makefile)
-javac tm/*.java
+    make all (if makefile)
+    javac tm/*.java (if no makefile)
 Run the compiled class file with the command:
-java tm.TMSimulator paths/file5.txt
+    java tm.TMSimulator paths/<filename>.txt
 Console output will give the results after the program finishes.  
 
 PROGRAM DESIGN AND IMPORTANT CONCEPTS:
 
-The TM class is split into various method calls that handle parsing, running, and extending. The parse mathod builds the three dimensional transition array from the file rules, and retrieves the amount of states and transition symbols required. The 3-dimensional array approach, was due to it essentially being simple values that were being read or written, and was much quicker to run than a nested map, and all the associated overhead. The parse utilizes a nested for loop to accomplish the majority of the building from file. The run method relies on a while loop to move through the necessary transitions and the multi-tape setup. The multi-tape approach is so that negative indices can be translated to an additional tape.
+The TM class is split into various method calls that handle parsing, running, and extending. The parse mathod builds the three dimensional transition array from the file rules, and retrieves the amount of states and transition symbols required. The 3-dimensional array approach was due to it essentially being simple values that were being read or written, and was much quicker to run than a nested map, and all the associated overhead. The parse utilizes a nested for loop to accomplish the majority of the building from file. 
 
-We went for speed in the design of this project, and made the decision that the entire nested map structure in other iterations of the project would slow us down completely, and so we went with the 3 dimensional array. Once we had drawn out the tape and the rules from some of the example tests, we realized it would be necessary to have some sort of fall back for values on the negative side of the tape. We hoped to accomplish some sort of object oriented approach by make the TM seperate from the simulator, by utilizing it, as its own object.
+The run method works through the Turing Machine created and inserted into a 3d array by the parse method. Run works through that created Turing Machine using all the steps 
+necessary to do so. Starting on state 0 with transition 0 the run method will then take the instructions given by Turing Machine to write into a tape and look at a new state
+according to the value currently seen in the tape. Run will then move the head according to the L or R instruction. These steps repeat until the final state is reached.
+A second tape is used for all negative values. This second tape, named negTape, is parsed and included in the resulting tape as the tape is printed.
+
+We went for speed in the design of this project, and made the decision that the entire nested map structure in other iterations of the project would slow us down completely, and so we went with the 3 dimensional array. Once we had drawn out the tape and the rules from some of the example tests, we realized it would be necessary to have some sort of fall back for values on the negative side of the tape. We hoped to accomplish some sort of object oriented approach by make the TM seperate from the simulator, by utilizing it, as its own object. 
+
+The final two methods in the TM class exist for the purpose of making the program run faster. getOutputLength and getOutputSum shave off barely any time noticeable by the human
+eye. It was implemented because it could and it got rid of a for loop at the end of the runtime.
 
 
-This is the sort of information someone who really wants to
-understand your program - possibly to make future enhancements -
-would want to know.
-Explain the main concepts and organization of your program so that
-the reader can understand how your program works. This is not a repeat
-of javadoc comments or an exhaustive listing of all methods, but an
-explanation of the critical algorithms and object interactions that make
-up the program.
-Explain the main responsibilities of the classes and interfaces that make
-up the program. Explain how the classes work together to achieve the
-program
-goals. If there are critical algorithms that a user should understand,
-explain them as well.
-If you were responsible for designing the program's classes and choosing
-how they work together, why did you design the program this way? What, if
-anything, could be improved?
 TESTING:
-How did you test your program to be sure it works and meets all of the
-requirements? What was the testing strategy? What kinds of tests were
-run?
-Can your program handle bad input? Is your program idiot-proof? How do
-you
-know? What are the known issues / bugs remaining in your program?
+This program was tested to function with all given files and print the correct output. This program was not tested to run with bad input. If bad input is given, such as a 
+Turing Machine which runs forever, the result will be an OutOfMemoryError.
+
 DISCUSSION:
-Discuss the issues you encountered during programming (development)
-and testing. What problems did you have? What did you have to research
-and learn on your own? What kinds of errors did you get? How did you
-fix them?
-What parts of the project did you find challenging? Is there anything
-that finally "clicked" for you in the process of working on this project?
+All errors encountered in the creation of this program were encountered mostly in the debugging process. There was no change to the logic.
+The largest issue encountered was the OutOfMemoryError which throws whenever Java encounters a variable which contains a value too large for the process to handle.
+This error popped up anytime the run method ran too long and extended the tape or negTape array one too many times. Fixing this issue required better understanding
+of 3D arrays as a concept and the process a Turing Machine needs to work through before finding the final state. Changes from the tape and negTape originally being
+char arrays before eventually making them integer arrays was one of these. Integer arrays are simply easier to work with as there is no fear or retrieving the wrong
+value from them when looking for an integer.
+
+
 EXTRA CREDIT:
-If the project had opportunities for extra credit that you attempted,
-be sure to call it out so the grader does not overlook it.
+We made a concerted attempt to make this program run quickly. Checking the time command on this program we can see the real time for this program to run is 1.717 
+seconds on file 5, the largest and slowest out of all the provided files. There is a possibility this can run quicker, but that could be said about anything.
+
 SOURCES:
-All sources used outside of lecture notes, slides, and the textbook need
-to
-be cited here. If you used websites, used GenAI, asked your dad or your
-boss
-or your roommate for help then you must cite those resources. I am not
-concerned if you use proper APA or MLA or another format as long as you
-include
-all relevant information. If it is a person or GenAI that you referenced,
-be
-sure to include who you talked to (or which AI you accessed), when you
-talked
-to them, and what help they provided (e.g. Student, Awesome. Private
-communication, 21 January 2026. Discussed how polymorphism allows the
-return
-types of methods implemented in a class to be different from the class
-specified
-in the interface as long as the <type in implementation> “is-a” <type in
-interface>.)
---------------------------------------------------------------------------
---
-All content in a README file is expected to be written in clear English
-with
-proper grammar, spelling, and punctuation. If you are not a strong writer,
-be sure to get someone else to help you with proofreading. Consider all
-project
-documentation to be professional writing for your boss and/or potential
-customers.
+ChatGPT was used is assistance with understanding how to properly cast a char variable into an int.
+None of this AI generated code made it into the final version of the program.
